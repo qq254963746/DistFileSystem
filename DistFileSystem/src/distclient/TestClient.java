@@ -4,7 +4,7 @@
  */
 package distclient;
 
-import distconfig.DistConnectionCodes;
+import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -19,9 +19,9 @@ import java.net.UnknownHostException;
  *
  * @author paul
  */
-public class DistTestClient {
+public class TestClient {
     
-    public DistTestClient () {}
+    public TestClient () {}
     
     public void DistTestServEnterNetwork () {
         DistConfig distConfig = DistConfig.get_Instance();
@@ -49,7 +49,7 @@ public class DistTestClient {
 
             
             System.out.println("Sending Code");
-            outStream.println(DistConnectionCodes.ENTERNETWORK);
+            outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
             
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
@@ -61,13 +61,13 @@ public class DistTestClient {
             System.out.println(sdc.get_CurrNodes());
             System.out.println(mdc.get_CurrNodes());
             
-            outStream.println(DistConnectionCodes.ENTERNETWORK);
+            outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
             
             int id = Integer.parseInt(in.readLine());
             System.out.println(id);
             
-            outStream.println(DistConnectionCodes.ENTERNETWORK);
+            outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
             
             int servID = Integer.parseInt(in.readLine());
@@ -75,7 +75,7 @@ public class DistTestClient {
             System.out.println(servID);
             System.out.println(servIP);
             
-            outStream.println(DistConnectionCodes.ENTERNETWORK);
+            outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
         }
         
@@ -116,7 +116,7 @@ public class DistTestClient {
 
             
             System.out.println("Sending Code");
-            outStream.println(DistConnectionCodes.CHECKPOSITION);
+            outStream.println(ConnectionCodes.CHECKPOSITION);
             outStream.flush();
             
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
@@ -131,13 +131,13 @@ public class DistTestClient {
             
             String tmpline = in.readLine();
             
-            if (Integer.parseInt(tmpline) == DistConnectionCodes.NEWID) {
+            if (Integer.parseInt(tmpline) == ConnectionCodes.NEWID) {
                 myID = Integer.parseInt(in.readLine());
                 System.out.println("New ID = " + myID);
                 tmpline = in.readLine();
             }
             
-            if (Integer.parseInt(tmpline) == DistConnectionCodes.CORRECTPOSITION) {
+            if (Integer.parseInt(tmpline) == ConnectionCodes.CORRECTPOSITION) {
                 String[] predicessor = (String[])ois.readObject();
                 System.out.println("Correct Position");
                 System.out.println("Pred ID = " + predicessor[0]);
@@ -169,7 +169,7 @@ public class DistTestClient {
     }
     
     public static void main (String[] args) {
-        DistTestClient dtc = new DistTestClient();
+        TestClient dtc = new TestClient();
         dtc.DistTestServCheckPosition(4);
     }
     

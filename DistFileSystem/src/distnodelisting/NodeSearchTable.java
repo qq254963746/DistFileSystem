@@ -2,44 +2,67 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package distconfig;
+package distnodelisting;
 
 import java.util.Vector;
-
 
 /**
  *
  * @author paul
  */
-public class DistGlobalTable extends Vector<Object> {
+public class NodeSearchTable extends Vector<Object> {
     
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static DistGlobalTable DGT = null;
+	private static NodeSearchTable dctInstance = null;
+    private String[] predecessor = null;
+    private String[] own = null;
     
-    private DistGlobalTable () {
-        super();
+    private NodeSearchTable () {}
+    
+    public static NodeSearchTable get_Instance () {
+        if (dctInstance == null) {
+            dctInstance = new NodeSearchTable();
+        }
+        return dctInstance;
     }
     
-    public static DistGlobalTable get_instance () {
-        if (DistGlobalTable.DGT == null) {
-            return new DistGlobalTable();
-        }
-        else {
-            return DistGlobalTable.DGT;
-        }
+    public void set_own(String ID, String ipAddress) {
+        String[] tmp = {ID, ipAddress};
+        this.own = tmp;
     }
     
-    public boolean add(String ID, String ipAddress) {
+    public String get_ownID () {
+        return this.own[0];
+    }
+    
+    public String get_ownIPAddress () {
+        return this.own[1];
+    }
+    
+    public void set_predicessor(String ID, String ipAddress) {
+        String[] temp = {ID, ipAddress};
+        this.predecessor = temp;
+    }
+    
+    public String get_predecessorID () {
+        return this.predecessor[0];
+    }
+    
+    public String get_predecessorIPAddress () {
+        return this.predecessor[1];
+    }
+    
+    public void add(String ID, String ipAddress) {
         String[] idip = {ID, ipAddress};
-        return super.add(idip);
+        super.add(idip);
     }
     
-    public Object set(int index, String ID, String ipAddress) {
+    public void set(int index, String ID, String ipAddress) {
         String[] idip = { ID, ipAddress };
-        return super.set(index, idip);
+        super.set(index, idip);
     }
     
     public String get_IDAt(int index) {
@@ -52,7 +75,7 @@ public class DistGlobalTable extends Vector<Object> {
         return idip[1];
     }
     
-    public Object remove_NodeAt(int index) {
+    public Object remove_NodeAt (int index) {
         return super.remove(index);
     }
     
@@ -81,5 +104,6 @@ public class DistGlobalTable extends Vector<Object> {
         }
         return false;
     }
+    
     
 }

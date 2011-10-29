@@ -8,7 +8,7 @@ package distconfig;
  *
  * @author paul
  */
-public class DistConnectionCodes {
+public class ConnectionCodes {
 
     // Connection Codes
     public static final int ENTERNETWORK = 1;

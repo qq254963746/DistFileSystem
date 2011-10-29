@@ -4,9 +4,10 @@
  */
 package distserver;
 
-import distconfig.DistConnectionTable;
-import distconfig.DistConnectionCodes;
+import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
+import distnodelisting.NodeSearchTable;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,12 +22,12 @@ import java.util.logging.Logger;
  *
  * @author paul
  */
-public class DistServCheckPosition implements Runnable {
+public class ServCheckPosition implements Runnable {
     
     private Socket client = null;
     private DistConfig distConfig = null;
     
-    public DistServCheckPosition (Socket cli) {
+    public ServCheckPosition (Socket cli) {
         this.client = cli;
     }
 
@@ -50,7 +51,7 @@ public class DistServCheckPosition implements Runnable {
             
             // Send an acknowledgement that the server is connected
             // for checking the position
-            outStream.println(DistConnectionCodes.CHECKPOSITION);
+            outStream.println(ConnectionCodes.CHECKPOSITION);
             outStream.flush();
             
             // Recieve the new node's ID
@@ -58,7 +59,7 @@ public class DistServCheckPosition implements Runnable {
             String newNodeID = (String)inStream.readLine();
             int newID = Integer.parseInt(newNodeID);
             
-            DistConnectionTable dct = DistConnectionTable.get_Instance();
+            NodeSearchTable dct = NodeSearchTable.get_Instance();
             
             // Get own ID
             int id = Integer.parseInt(dct.get_ownID());
@@ -66,7 +67,7 @@ public class DistServCheckPosition implements Runnable {
             // If own ID = the new nodes ID, create a new ID for it
             if (newID == id) {
                 newID = (newID + 1) % distConfig.get_MaxNodes();
-                outStream.println(DistConnectionCodes.NEWID);
+                outStream.println(ConnectionCodes.NEWID);
                 outStream.println(Integer.toString(newID));
                 outStream.flush();
                 // Now continue with the check
@@ -79,7 +80,7 @@ public class DistServCheckPosition implements Runnable {
                     (id > nextID && newID > id && newID > nextID) ||
                     (id > nextID && newID < id && newID < nextID)) {
                 // Send CORRECTPOSITION message
-                outStream.println(DistConnectionCodes.CORRECTPOSITION);
+                outStream.println(ConnectionCodes.CORRECTPOSITION);
                 outStream.flush();
                 // Send the string array of this id and ip
                 String[] ownInfo = { Integer.toString(id), 
@@ -131,7 +132,7 @@ public class DistServCheckPosition implements Runnable {
                 }
                 
                 // Once found, send the wrong position message
-                outStream.println(DistConnectionCodes.WRONGPOSITION);
+                outStream.println(ConnectionCodes.WRONGPOSITION);
                 // Send the new ID and IP of the next node to check
                 outStream.println(Integer.toString(id));
                 outStream.println(ipAddress);
@@ -148,7 +149,7 @@ public class DistServCheckPosition implements Runnable {
         
         
         catch (IOException ex) {
-            Logger.getLogger(DistServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }

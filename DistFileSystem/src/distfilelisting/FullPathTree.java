@@ -1,24 +1,24 @@
 /**
 */
 
-package distconfig;
+package distfilelisting;
 
 import javax.swing.tree.*;
 
 
 
-class DistFullPathTree {
+class FullPathTree {
 	
-	private DistFullPathTree instance = null;
+	private FullPathTree instance = null;
 	private DefaultMutableTreeNode rootNode = null;
 	
-	private DistFullPathTree () {
+	private FullPathTree () {
 		this.rootNode = new DefaultMutableTreeNode("/");
 	}
 	
-	public DistFullPathTree get_Instance () {
+	public FullPathTree get_Instance () {
 		if (instance == null) {
-			instance = new DistFullPathTree();
+			instance = new FullPathTree();
 		}
 		return instance;
 	}

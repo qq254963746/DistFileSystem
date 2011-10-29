@@ -4,11 +4,11 @@
  */
 package distserver;
 
-import distconfig.DistConnectionCodes;
+import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
-import distconfig.DistConnectionTable;
-import distserver.DistServCheckPosition;
-import distserver.DistServEnterNetwork;
+import distnodelisting.NodeSearchTable;
+import distserver.ServCheckPosition;
+import distserver.ServEnterNetwork;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author paul
  */
-public class DistServer implements Runnable {
+public class Server implements Runnable {
 
     private ServerSocket sock;
     
@@ -32,7 +32,7 @@ public class DistServer implements Runnable {
     private Vector<Thread> backgrounded = new Vector<Thread>();
     private DistConfig distConfig;
     
-    public DistServer () {
+    public Server () {
         this.distConfig = DistConfig.get_Instance();
         
         try {
@@ -69,13 +69,13 @@ public class DistServer implements Runnable {
                 
                 switch (code) {
                     // If this is a new client looking to join the network
-                    case DistConnectionCodes.ENTERNETWORK:
+                    case ConnectionCodes.ENTERNETWORK:
                         if (distConfig.get_CurrNodes() == distConfig.get_MaxNodes()) {
                             BufferedOutputStream bos = new BufferedOutputStream (
                                     client.getOutputStream());
                             // Setup the writer to the output stream
                             PrintWriter outStream = new PrintWriter(bos, false);
-                            outStream.println(DistConnectionCodes.NETWORKFULL);
+                            outStream.println(ConnectionCodes.NETWORKFULL);
                             outStream.close();
                             bos.close();
                             in.close();
@@ -83,8 +83,8 @@ public class DistServer implements Runnable {
                         }
                         else {
                             // Setup the appropriate class
-                            DistServEnterNetwork dsen = 
-                                    new DistServEnterNetwork(client);
+                            ServEnterNetwork dsen = 
+                                    new ServEnterNetwork(client);
                             // Setup and start the thread, so it doesn't block
                             Thread enterDSEN = new Thread(dsen);
                             enterDSEN.start();
@@ -93,23 +93,23 @@ public class DistServer implements Runnable {
                             enterDSEN = null;
                         }
                         break;
-                    case DistConnectionCodes.CHECKPOSITION:
+                    case ConnectionCodes.CHECKPOSITION:
                         // Setup the appropriate class
-                        DistServCheckPosition dscp = 
-                                new DistServCheckPosition(client);
+                        ServCheckPosition dscp = 
+                                new ServCheckPosition(client);
                         // Setup and start the thread, so it doesn't block
                         Thread enterDSCP = new Thread (dscp);
                         enterDSCP.start();
                         this.backgrounded.add(enterDSCP);
                         enterDSCP = null;
                         break;
-                    case DistConnectionCodes.NEWPREDECESSOR:
+                    case ConnectionCodes.NEWPREDECESSOR:
                         break;
-                    case DistConnectionCodes.NEWSUCCESSOR:
+                    case ConnectionCodes.NEWSUCCESSOR:
                         break;
-                    case DistConnectionCodes.SENDFILE:
+                    case ConnectionCodes.SENDFILE:
                         break;
-                    case DistConnectionCodes.UPDATETABLE:
+                    case ConnectionCodes.UPDATETABLE:
                         break;
                     default:
                         NumberFormatException nfe =
@@ -141,7 +141,7 @@ public class DistServer implements Runnable {
                     PrintWriter outputStream = new PrintWriter(bos, false);
                     
                     // Write the error message to the client and flush
-                    outputStream.println(DistConnectionCodes.UNRECOGNIZEDCODE);
+                    outputStream.println(ConnectionCodes.UNRECOGNIZEDCODE);
                     outputStream.println("Unrecognized Code: " + line);
                     outputStream.flush();
                     
@@ -150,20 +150,20 @@ public class DistServer implements Runnable {
                     client.close();
                 } catch (IOException ex) {
                     // Something went wrong replying to the client
-                    Logger.getLogger(DistServer.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             catch (Throwable th) {
                 // Something went wrong
-                Logger.getLogger(DistServer.class.getName()).log(Level.SEVERE, null, th);
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, th);
             }
         }
     }
     
     
     public static void main (String[] args) {
-        DistServer ds = new DistServer();
-        DistConnectionTable dct = DistConnectionTable.get_Instance();
+        Server ds = new Server();
+        NodeSearchTable dct = NodeSearchTable.get_Instance();
         
         dct.set_own("5", "5.5.5.5");
         dct.add("10", "10.10.10.10");

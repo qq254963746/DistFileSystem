@@ -5,7 +5,7 @@
 package distconfig;
 
 import distconfig.DistConfig;
-import distserver.DistServEnterNetwork;
+import distserver.ServEnterNetwork;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +35,7 @@ public class Sha1Generator {
         }
         catch (NoSuchAlgorithmException nsae) {
             Logger.getLogger(
-                    DistServEnterNetwork.class.getName()).log(
+                    ServEnterNetwork.class.getName()).log(
                     Level.SEVERE, null, nsae);
         }
         

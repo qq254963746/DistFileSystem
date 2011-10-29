@@ -5,9 +5,10 @@
 package distserver;
 
 import distconfig.Sha1Generator;
-import distconfig.DistGlobalTable;
-import distconfig.DistConnectionTable;
 import distconfig.DistConfig;
+import distnodelisting.NodeSearchTable;
+import distnodelisting.GlobalNodeTable;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author paul
  */
-public class DistServEnterNetwork implements Runnable {
+public class ServEnterNetwork implements Runnable {
     
     private Socket client = null;
     private DistConfig distConf = null;
@@ -32,7 +33,7 @@ public class DistServEnterNetwork implements Runnable {
      * 
      * @param cli The client that has already connected to the network 
      */
-    public DistServEnterNetwork (Socket cli) {
+    public ServEnterNetwork (Socket cli) {
         this.client = cli;
         if (this.client == null) {
             // TODO: Throw an exception
@@ -45,7 +46,7 @@ public class DistServEnterNetwork implements Runnable {
         try {
             distConf = DistConfig.get_Instance();
             Logger.getLogger(
-                    DistServEnterNetwork.class.getName()).log(
+                    ServEnterNetwork.class.getName()).log(
                     Level.INFO, null, 
                     "In thread to connect a new node to the netwrok");
             
@@ -69,14 +70,14 @@ public class DistServEnterNetwork implements Runnable {
             inStream.readLine();
             
             // Get the client IP address and create the hash
-            DistConnectionTable distConnTable = 
-                    DistConnectionTable.get_Instance();
+            NodeSearchTable distConnTable = 
+                    NodeSearchTable.get_Instance();
             InetAddress cliAddress = client.getInetAddress();
             int newClientID = 
                     Sha1Generator.generate_Sha1(cliAddress.getHostAddress());
             
             if (distConf.get_UseFullTable()) {
-                DistGlobalTable dgt = DistGlobalTable.get_instance();
+                GlobalNodeTable dgt = GlobalNodeTable.get_instance();
                 while (dgt.contains_ID(newClientID)) {
                     newClientID = (newClientID + 1) % distConf.get_MaxNodes();
                 }
@@ -97,7 +98,7 @@ public class DistServEnterNetwork implements Runnable {
             // If the configuration states to use the entire table,
             // Then send the entire table
             if (distConf.get_UseFullTable()) {
-                DistGlobalTable dgt = DistGlobalTable.get_instance();
+                GlobalNodeTable dgt = GlobalNodeTable.get_instance();
                 oos.writeObject(dgt);
                 oos.flush();
             }
@@ -167,9 +168,9 @@ public class DistServEnterNetwork implements Runnable {
                 // Somehting went wrong with IO to the client
                 client.close();
             } catch (IOException ex1) {
-                Logger.getLogger(DistServEnterNetwork.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ServEnterNetwork.class.getName()).log(Level.SEVERE, null, ex1);
             }
-            Logger.getLogger(DistServEnterNetwork.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServEnterNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
