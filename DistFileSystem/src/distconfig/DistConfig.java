@@ -20,6 +20,7 @@ public class DistConfig implements Serializable {
 	private static DistConfig distConf = null;
     
     private boolean USEFULLTABLE = false;
+    private boolean USEFULLPATHTABLE = false;
     private int MAXNODES = 40;
     private int CURRNODES = 0;
     private int ServPortNumber = 8956;
@@ -62,6 +63,14 @@ public class DistConfig implements Serializable {
     public int set_servPortNumber(int port) {
         this.ServPortNumber = port;
         return port;
+    }
+    
+    public boolean get_useFullPathTable() {
+    	return this.USEFULLPATHTABLE;
+    }
+    
+    public void set_useFullPathTable(boolean useFullTable) {
+    	this.USEFULLPATHTABLE = useFullTable;
     }
     
 }

@@ -28,12 +28,17 @@ public class DistServEnterNetwork implements Runnable {
     private Socket client = null;
     private DistConfig distConf = null;
     
+    /**
+     * 
+     * @param cli The client that has already connected to the network 
+     */
     public DistServEnterNetwork (Socket cli) {
         this.client = cli;
         if (this.client == null) {
             // TODO: Throw an exception
         }
     }
+
 
     @Override
     public void run() {

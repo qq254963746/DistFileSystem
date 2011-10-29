@@ -13,7 +13,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -30,7 +29,7 @@ public class DistServer implements Runnable {
     private ServerSocket sock;
     
     private boolean running = true;
-    private Vector backgrounded = new Vector();
+    private Vector<Thread> backgrounded = new Vector<Thread>();
     private DistConfig distConfig;
     
     public DistServer () {
