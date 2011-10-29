@@ -23,4 +23,11 @@ class DistFullPathTree {
 		return instance;
 	}
 	
+	public void make_Directory (String fullPath) {
+		String path = null;
+		String newDir = null;
+		path = newDir;
+		rootNode.add(new DefaultMutableTreeNode(path));
+	}
+	
 }
