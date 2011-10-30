@@ -21,6 +21,8 @@ public class UserManagement {
     
     private UserManagement () {
 		ownUsername = System.getProperty("user.name");
+		this.globalUsers = new Hashtable<String, String>();
+		this.globalUsers.put(ownUsername, "5");
 	}
 	
 	public static UserManagement get_Instance () {

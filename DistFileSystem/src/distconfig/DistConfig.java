@@ -5,7 +5,6 @@
 package distconfig;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 
 /**
  *
