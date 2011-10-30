@@ -76,7 +76,7 @@ public class ServEnterNetwork implements Runnable {
             int newClientID = 
                     Sha1Generator.generate_Sha1(cliAddress.getHostAddress());
             
-            if (distConf.get_UseFullTable()) {
+            if (distConf.get_UseGlobalNodeTable()) {
                 GlobalNodeTable dgt = GlobalNodeTable.get_instance();
                 while (dgt.contains_ID(newClientID)) {
                     newClientID = (newClientID + 1) % distConf.get_MaxNodes();
@@ -97,7 +97,7 @@ public class ServEnterNetwork implements Runnable {
             
             // If the configuration states to use the entire table,
             // Then send the entire table
-            if (distConf.get_UseFullTable()) {
+            if (distConf.get_UseGlobalNodeTable()) {
                 GlobalNodeTable dgt = GlobalNodeTable.get_instance();
                 oos.writeObject(dgt);
                 oos.flush();

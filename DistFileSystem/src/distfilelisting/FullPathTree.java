@@ -7,16 +7,16 @@ import javax.swing.tree.*;
 
 
 
-class FullPathTree {
+public class FullPathTree {
 	
-	private FullPathTree instance = null;
+	private static FullPathTree instance = null;
 	private DefaultMutableTreeNode rootNode = null;
 	
 	private FullPathTree () {
 		this.rootNode = new DefaultMutableTreeNode("/");
 	}
 	
-	public FullPathTree get_Instance () {
+	public static FullPathTree get_Instance () {
 		if (instance == null) {
 			instance = new FullPathTree();
 		}

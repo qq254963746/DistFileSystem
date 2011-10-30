@@ -7,21 +7,21 @@ import java.util.Vector;
 
 
 
-class LocalPathListing extends Vector<Object> {
+public class LocalPathList extends Vector<Object> {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private LocalPathListing instance = null;
+	private static LocalPathList instance = null;
 	
-	private LocalPathListing () {
+	private LocalPathList () {
 		
 	}
 	
-	public LocalPathListing get_Instance() {
+	public static LocalPathList get_Instance() {
 		if (instance == null) {
-			instance = new LocalPathListing();
+			instance = new LocalPathList();
 		}
 		return instance;
 	}

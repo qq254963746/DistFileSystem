@@ -7,21 +7,21 @@ import java.util.Vector;
 
 
 
-class FullPathListing extends Vector<Object> {
+public class FullPathList extends Vector<Object> {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private FullPathListing instance = null;
+	private static FullPathList instance = null;
 	
-	private FullPathListing () {
+	private FullPathList () {
 		
 	}
 	
-	public FullPathListing get_Instance() {
+	public static FullPathList get_Instance() {
 		if (instance == null) {
-			instance = new FullPathListing();
+			instance = new FullPathList();
 		}
 		return instance;
 	}

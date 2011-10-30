@@ -5,6 +5,7 @@
 package distconfig;
 
 import java.io.Serializable;
+import java.util.Hashtable;
 
 /**
  *
@@ -19,18 +20,24 @@ public class DistConfig implements Serializable {
 
 	private static DistConfig distConf = null;
     
-    private boolean USEFULLTABLE = false;
-    private boolean USEFULLPATHTABLE = false;
+    private boolean useGlobalPathTable = false;
+    private boolean useGlobalNodeTable = false;
+    
     private int MAXNODES = 40;
     private int CURRNODES = 0;
     private int ServPortNumber = 8956;
     
-    private DistConfig() {}
+    private String rootpath = null;
+    
+    private DistConfig() {
+    	this.rootpath = System.getProperty("user.dir");
+    }
     
     public static DistConfig get_Instance () {
         if (distConf == null) {
             distConf = new DistConfig();
         }
+        
         return distConf;
     }
     
@@ -38,8 +45,8 @@ public class DistConfig implements Serializable {
         return this.MAXNODES;
     }
     
-    public boolean get_UseFullTable () {
-        return this.USEFULLTABLE;
+    public boolean get_UseGlobalNodeTable () {
+        return this.useGlobalNodeTable;
     }
     
     public int get_CurrNodes () {
@@ -65,12 +72,12 @@ public class DistConfig implements Serializable {
         return port;
     }
     
-    public boolean get_useFullPathTable() {
-    	return this.USEFULLPATHTABLE;
+    public boolean get_useGlobalPathTable() {
+    	return this.useGlobalPathTable;
     }
     
-    public void set_useFullPathTable(boolean useFullTable) {
-    	this.USEFULLPATHTABLE = useFullTable;
+    public String get_rootPath () {
+    	return this.rootpath;
     }
     
 }
