@@ -1,10 +1,20 @@
 /**
 */
 
+
+// 
+
+
+// TODO: Discover the current directory structure
+
+
 package distfilelisting;
 
+import java.io.File;
 import java.util.Enumeration;
 import javax.swing.tree.*;
+
+import distconfig.DistConfig;
 import distconfig.UserManagement;
 
 
@@ -76,6 +86,37 @@ public class LocalPathTree {
 				retval[1] += parentPath[index] + "/";
 			}
 			retval[1] += " does not exist.";
+			return retval;
+		}
+		
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) currChild.getParent();
+		if (parent == null) {
+			nodeChildren = currChild.children();
+		}
+		else {
+			nodeChildren = parent.children();
+		}
+		while (nodeChildren.hasMoreElements()) {
+			DefaultMutableTreeNode testNode = (DefaultMutableTreeNode) nodeChildren.nextElement();
+			FileObject testFile = (FileObject) testNode.getUserObject();
+			if (testFile.getName().equals(newDirName)) {
+				retval[0] = "0";
+				retval[1] = "";
+				for (int index = 0; index < parentPath.length; index++) {
+					retval[1] += parentPath[index] + "/";
+				}
+				retval[1] += newDirName + "/ already exists";
+				return retval;
+			}
+		}
+		
+		DistConfig distConfig = DistConfig.get_Instance();
+		String pathWithNewDir = distConfig.get_rootPath() + fullPath;
+		boolean success = (new File(pathWithNewDir)).mkdir();
+		
+		if (!success) {
+			retval[0] = "0";
+			retval[1] = "The new directory could not be created";
 			return retval;
 		}
 		
