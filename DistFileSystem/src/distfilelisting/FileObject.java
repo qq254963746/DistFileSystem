@@ -3,7 +3,6 @@
 
 package distfilelisting;
 
-import distconfig.UserManagement;
 
 public class FileObject {
 	

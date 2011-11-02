@@ -15,7 +15,6 @@ import java.util.Enumeration;
 import javax.swing.tree.*;
 
 import distconfig.DistConfig;
-import distconfig.UserManagement;
 
 
 public class LocalPathTree {
