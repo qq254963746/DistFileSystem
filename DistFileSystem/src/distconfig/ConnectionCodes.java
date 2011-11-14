@@ -21,6 +21,7 @@ public class ConnectionCodes {
     public static final int CORRECTPOSITION = 8;
     public static final int WRONGPOSITION = 9;
     public static final int NEWID = 10;
+    public static final int NEWNODE = 11;
     
     // Error Codes
     public static final int UNRECOGNIZEDCODE = 900;
