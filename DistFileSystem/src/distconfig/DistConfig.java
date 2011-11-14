@@ -4,6 +4,7 @@
  */
 package distconfig;
 
+import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -27,9 +28,17 @@ public class DistConfig implements Serializable {
     private int ServPortNumber = 8956;
     
     private String rootpath = null;
+    private int bufferSize = 1024;
     
     private DistConfig() {
     	this.rootpath = System.getProperty("user.dir");
+    	
+		boolean success = (new File(this.rootpath + "/home")).mkdir();
+		if (!success) {
+			System.exit(-1);
+		}
+    	
+    	this.rootpath = this.rootpath + "/home";
     }
     
     public static DistConfig get_Instance () {
@@ -78,5 +87,13 @@ public class DistConfig implements Serializable {
     public String get_rootPath () {
     	return this.rootpath;
     }
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
     
 }

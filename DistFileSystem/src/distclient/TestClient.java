@@ -170,7 +170,7 @@ public class TestClient {
     
     public static void main (String[] args) {
         TestClient dtc = new TestClient();
-        dtc.DistTestServCheckPosition(7);
+        dtc.DistTestServCheckPosition(10);
     }
     
 }

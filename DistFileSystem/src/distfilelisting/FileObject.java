@@ -3,6 +3,8 @@
 
 package distfilelisting;
 
+import distconfig.Sha1Generator;
+
 
 public class FileObject {
 	
@@ -13,6 +15,7 @@ public class FileObject {
 	private int groupPermission;
 	private int globalPermission;
 	private boolean isDirectory;
+	private int hash;
 	
 	public FileObject (String name, boolean isDirectory, int ownerPerm, 
 			int groupPerm, int globalPerm, String reqUser, String defGroup) {
@@ -24,6 +27,7 @@ public class FileObject {
 		this.isDirectory = isDirectory;
 		this.owner = reqUser;
 		this.group = defGroup;
+		this.set_hash(Sha1Generator.generate_Sha1(this.name));
 	}
 	
 	public String getName() {
@@ -146,5 +150,24 @@ public class FileObject {
 	
 	public boolean get_isDirectory () {
 		return this.isDirectory;
+	}
+	
+	public static int[] get_permissionsFromString(String permissions) {
+		int[] perms = new int[3];
+		
+		char[] permchar = permissions.toCharArray();
+		perms[0] = Character.getNumericValue(permchar[0]);
+		perms[1] = Character.getNumericValue(permchar[1]);
+		perms[2] = Character.getNumericValue(permchar[2]);
+		
+		return perms;
+	}
+
+	public int get_hash() {
+		return hash;
+	}
+
+	public void set_hash(int hash) {
+		this.hash = hash;
 	}
 }

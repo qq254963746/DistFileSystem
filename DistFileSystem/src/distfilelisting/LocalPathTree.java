@@ -35,6 +35,17 @@ public class LocalPathTree {
 		}
 		return instance;
 	}
+	
+	public static LocalPathTree set_Instance(LocalPathTree lpt) {
+		instance = lpt;
+		
+		DistConfig distConfig = DistConfig.get_Instance();
+		String rootPath = distConfig.get_rootPath();
+		
+		
+		
+		return instance;
+	}
 
 	// Path to new directory
 	// directory name
@@ -128,6 +139,7 @@ public class LocalPathTree {
 		return retval;
 	}
 	
+		
 	
 	public static void main (String[] args) {
 		String[] retval = new String[2];

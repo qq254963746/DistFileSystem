@@ -41,7 +41,7 @@ public class ServCheckPosition implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
-            // Get the ouptut stream for the client
+            // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
@@ -49,12 +49,12 @@ public class ServCheckPosition implements Runnable {
             // Setup the object writer to the client
             ObjectOutputStream oos = new ObjectOutputStream (bos);
             
-            // Send an acknowledgement that the server is connected
+            // Send an acknowledgment that the server is connected
             // for checking the position
             outStream.println(ConnectionCodes.CHECKPOSITION);
             outStream.flush();
             
-            // Recieve the new node's ID
+            // Receive the new node's ID
             System.out.println("Waiting for node ID");
             String newNodeID = (String)inStream.readLine();
             int newID = Integer.parseInt(newNodeID);
