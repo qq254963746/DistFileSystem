@@ -104,9 +104,43 @@ public class Server implements Runnable {
                         enterDSCP = null;
                         break;
                     case ConnectionCodes.NEWPREDECESSOR:
+                    	// Setup the appropriate class
+                        ServNewPredecessor dsnp = 
+                                new ServNewPredecessor(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSNP = new Thread (dsnp);
+                        enterDSNP.start();
+                        this.backgrounded.add(enterDSNP);
+                        enterDSNP = null;
                         break;
                     case ConnectionCodes.NEWSUCCESSOR:
+                    	// Setup the appropriate class
+                        ServNewSuccessor dsns = 
+                                new ServNewSuccessor(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSNS = new Thread (dsns);
+                        enterDSNS.start();
+                        this.backgrounded.add(enterDSNS);
+                        enterDSNS = null;
                         break;
+                    case ConnectionCodes.NEWNODE:
+                    	// Setup the appropriate class
+                        ServNewNode dsnn = new ServNewNode(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSNN = new Thread (dsnn);
+                        enterDSNN.start();
+                        this.backgrounded.add(enterDSNN);
+                        enterDSNN = null;
+                        break;
+                    case ConnectionCodes.SETUPSEARCHTABLE:
+                    	// Setup the appropriate class
+                        //ServSetupSearchTable dscp = 
+                        //        new ServCheckPosition(client);
+                        // Setup and start the thread, so it doesn't block
+                        //Thread enterDSCP = new Thread (dscp);
+                        //enterDSCP.start();
+                        //this.backgrounded.add(enterDSCP);
+                        //enterDSCP = null;
                     case ConnectionCodes.SENDFILE:
                         break;
                     case ConnectionCodes.UPDATETABLE:
