@@ -134,13 +134,13 @@ public class Server implements Runnable {
                         break;
                     case ConnectionCodes.SETUPSEARCHTABLE:
                     	// Setup the appropriate class
-                        //ServSetupSearchTable dscp = 
-                        //        new ServCheckPosition(client);
+                        ServSetupSearchTable dsst = 
+                                new ServSetupSearchTable(client);
                         // Setup and start the thread, so it doesn't block
-                        //Thread enterDSCP = new Thread (dscp);
-                        //enterDSCP.start();
-                        //this.backgrounded.add(enterDSCP);
-                        //enterDSCP = null;
+                        Thread enterDSST = new Thread (dsst);
+                        enterDSST.start();
+                        this.backgrounded.add(enterDSST);
+                        enterDSST = null;
                     case ConnectionCodes.SENDFILE:
                         break;
                     case ConnectionCodes.UPDATETABLE:
