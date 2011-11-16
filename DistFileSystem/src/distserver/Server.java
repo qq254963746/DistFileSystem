@@ -204,7 +204,7 @@ public class Server implements Runnable {
         dct.add("15", "15.15.15.15");
         dct.add("20", "20.20.20.20");
         dct.add("25", "25.25.25.25");
-        dct.add("3", "3.3.3.3");
+        //dct.add("3", "3.3.3.3");
         dct.set_predicessor("0", "0.0.0.0");
         
         System.out.println("own = " + dct.get_ownID());

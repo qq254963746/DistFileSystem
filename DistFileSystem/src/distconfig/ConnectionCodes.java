@@ -23,6 +23,7 @@ public class ConnectionCodes {
     public static final int NEWID = 10;
     public static final int NEWNODE = 11;
     public static final int SETUPSEARCHTABLE = 12;
+    public static final int GETFILE = 13;
     
     // Error Codes
     public static final int UNRECOGNIZEDCODE = 900;

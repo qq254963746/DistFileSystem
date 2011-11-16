@@ -171,7 +171,7 @@ public class TestClient {
     public static void main (String[] args) {
     	System.out.println("Hello");
         TestClient dtc = new TestClient();
-        dtc.DistTestServCheckPosition(5);
+        dtc.DistTestServCheckPosition(27);
     }
     
 }
