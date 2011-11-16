@@ -94,8 +94,8 @@ public class TestClient {
     
     
     public void DistTestServCheckPosition (int myID) {
-        DistConfig distConfig = DistConfig.get_Instance();
-        try {
+    	DistConfig distConfig = DistConfig.get_Instance();
+    	try {
             System.out.println("Connecting");
             Socket sock = new Socket("127.0.0.1", distConfig.get_servPortNumber());
 
@@ -169,8 +169,9 @@ public class TestClient {
     }
     
     public static void main (String[] args) {
+    	System.out.println("Hello");
         TestClient dtc = new TestClient();
-        dtc.DistTestServCheckPosition(10);
+        dtc.DistTestServCheckPosition(5);
     }
     
 }

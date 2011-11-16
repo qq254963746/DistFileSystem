@@ -33,10 +33,13 @@ public class DistConfig implements Serializable {
     private DistConfig() {
     	this.rootpath = System.getProperty("user.dir");
     	
-		boolean success = (new File(this.rootpath + "/home")).mkdir();
-		if (!success) {
-			System.exit(-1);
-		}
+    	File home = new File(this.rootpath + "/home");
+    	if (!home.exists()) {
+			boolean success = home.mkdir();
+			if (!success) {
+				System.exit(-1);
+			}
+    	}
     	
     	this.rootpath = this.rootpath + "/home";
     }
@@ -47,6 +50,11 @@ public class DistConfig implements Serializable {
         }
         
         return distConf;
+    }
+    
+    public static DistConfig set_Instance(DistConfig distconfiguration) {
+    	distConf = distconfiguration;
+    	return distConf;
     }
     
     public int get_MaxNodes () {
