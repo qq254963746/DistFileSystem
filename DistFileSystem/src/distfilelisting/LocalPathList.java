@@ -52,6 +52,16 @@ public class LocalPathList extends Vector<FileObject> {
 		return retval;
 	}
 	
+	public FileObject get_file (String file_name) {
+		for (int index = 0; index < this.size(); index++) {
+			FileObject currentObj = (FileObject)this.get(index);
+			if (currentObj.getName().equals(file_name)) {
+				return currentObj;
+			}
+		}
+		return null;
+	}
+	
 	public Vector<FileObject> get_filesBetween(int lowerHash, int upperHash) {
 		Vector<FileObject> retval = new Vector<FileObject>();
 		

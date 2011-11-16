@@ -13,12 +13,16 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distconfig.Sha1Generator;
+import distfilelisting.FileObject;
+import distfilelisting.LocalPathList;
+import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 
 class ServGetFile implements Runnable {
@@ -67,23 +71,69 @@ class ServGetFile implements Runnable {
             		fileHash > Integer.parseInt(nst.get_predecessorID())) {
             	
             	outStream.println(ConnectionCodes.CORRECTPOSITION);
+            	outStream.flush();
             	
             	// Send each file individually
                 String fullPathName = distConfig.get_rootPath() + filename;
-                	
-                File toTransfer = new File (fullPathName);
-                FileInputStream fis = new FileInputStream(toTransfer);
-                byte[] buffer = new byte[distConfig.getBufferSize()];
                 
-                Integer bytesRead = 0;
-                while ((bytesRead = fis.read(buffer)) > 0) {
-                	oos.writeObject(bytesRead);
-                	oos.writeObject(Arrays.copyOf(buffer, buffer.length));
-                	oos.flush();
+                // Check if the file exists and if the user has permissions
+                FileObject fileobj = LocalPathList.get_Instance().get_file(fullPathName);
+                boolean isAllowedAccess = false;
+                
+                if (fileobj == null) {
+                	outStream.println(ConnectionCodes.FILEDOESNTEXIST);
+                	outStream.flush();
                 }
-                
-                // Get confirmation that it made it
-                inStream.readLine();
+                else {
+                	File toTransfer = new File (fullPathName);
+                	
+                	if (!toTransfer.exists()) {
+                		outStream.println(ConnectionCodes.FILEDOESNTEXIST);
+                		outStream.flush();
+                	}
+                	else {
+	                	
+	                	outStream.println(ConnectionCodes.FILEEXISTS);
+	                	outStream.flush();
+	                	
+	                	String username = inStream.readLine();
+	                	Vector<String> groups = UserManagement.get_Instance().get_GroupsForUser(username);
+	                	
+	                	if (username == fileobj.getOwner()) {
+	                		isAllowedAccess = true;
+	                	}
+	                	else if (groups.contains(fileobj.getGroup())) {
+	                		if (fileobj.getGroupPermision() >= 4) {
+	                			isAllowedAccess = true;
+	                		}
+	                	}
+	                	else if (fileobj.getGlobalPermission() > 4) {
+	                		isAllowedAccess = true;
+	                	}
+	                	
+	                	if (!isAllowedAccess) {
+	                    	outStream.println(ConnectionCodes.NOTAUTHORIZED);
+	                    	outStream.flush();
+	                    }
+	                    else {
+	                    	outStream.println(ConnectionCodes.AUTHORIZED);
+	                    	outStream.flush();
+	                    	
+	                        FileInputStream fis = new FileInputStream(toTransfer);
+	                        byte[] buffer = new byte[distConfig.getBufferSize()];
+	                        
+	                        Integer bytesRead = 0;
+	                        while ((bytesRead = fis.read(buffer)) > 0) {
+	                        	oos.writeObject(bytesRead);
+	                        	oos.writeObject(Arrays.copyOf(buffer, buffer.length));
+	                        	oos.flush();
+	                        }
+	                        
+	                        // Get confirmation that it made it
+	                        inStream.readLine();
+	                    }
+                	}
+                }
             }
             
             // else locate next server to check

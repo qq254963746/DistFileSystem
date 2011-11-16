@@ -24,6 +24,10 @@ public class ConnectionCodes {
     public static final int NEWNODE = 11;
     public static final int SETUPSEARCHTABLE = 12;
     public static final int GETFILE = 13;
+    public static final int FILEDOESNTEXIST = 14;
+    public static final int FILEEXISTS = 15;
+    public static final int NOTAUTHORIZED = 16;
+    public static final int AUTHORIZED = 17;
     
     // Error Codes
     public static final int UNRECOGNIZEDCODE = 900;
