@@ -1,7 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author paul
  */
+
 package distserver;
 
 import distconfig.Sha1Generator;
@@ -40,7 +40,9 @@ public class ServEnterNetwork implements Runnable {
         }
     }
 
-
+    /**
+     * Generates the new ID for the client and tells it where to look first for its next position
+     */
     @Override
     public void run() {
         try {

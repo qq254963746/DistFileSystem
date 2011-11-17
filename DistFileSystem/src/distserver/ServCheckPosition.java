@@ -1,6 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author paul
  */
 package distserver;
 
@@ -19,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Checks the clients position in the network
  * @author paul
  */
 public class ServCheckPosition implements Runnable {
@@ -27,10 +26,19 @@ public class ServCheckPosition implements Runnable {
     private Socket client = null;
     private DistConfig distConfig = null;
     
+    /**
+     * 
+     * @param cli : The socket to which the client is connected
+     */
     public ServCheckPosition (Socket cli) {
         this.client = cli;
     }
 
+    /**
+     * Checks the position of the client
+     * If it is in the correct location, the server sends the new client
+     * its new predecessor ID and IP and new successor ID and IP
+     */
     @Override
     public void run() {
         

@@ -1,4 +1,5 @@
 /**
+ * @author paul
 */
 
 package distserver;
@@ -16,18 +17,30 @@ import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distnodelisting.NodeSearchTable;
 
-
+/**
+ * Used to setup the search table of a new node
+ * 
+ * @author paul
+ *
+ */
 class ServSetupSearchTable implements Runnable {
 	
 	private Socket client = null;
 
+	/**
+	 * Constructor, sets the client
+	 * @param cli : The socket the client is connected to
+	 */
 	public ServSetupSearchTable (Socket cli) {
 		this.client = cli;
 	}
 	
+	/**
+	 * Used to run the server to get the ID and IP of the client
+	 * Uses these values to update the search table 
+	 */
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		
 		try {
 	        // Get the input stream for the client
@@ -39,32 +52,68 @@ class ServSetupSearchTable implements Runnable {
 	        // Setup the writer to the client
 	        PrintWriter outStream = new PrintWriter(bos, false);
 	        
+	        // Send that the server is ready to receive
 	        outStream.println(ConnectionCodes.SETUPSEARCHTABLE);
 	        outStream.flush();
 	        
+	        // Receive the ID and IP of the client
 	        int newID = Integer.parseInt(inStream.readLine());
 	        String newIP = inStream.readLine();
 	        
+	        // Get the node search table and the local ID
 	        NodeSearchTable nst = NodeSearchTable.get_Instance();
-	        
 	        int myID = Integer.parseInt(nst.get_ownID());
+	        int predecessorID = Integer.parseInt(nst.get_predecessorID());
 	        
-	        if (newID < myID && newID > Integer.parseInt(nst.get_predecessorID())) {
+	        // Check if the new ID is between the current ID and its predecessor
+	        // First check if the new ID is less than the local ID and greater than the predecessor ID
+	        if (newID < myID && newID > predecessorID) {
 	    		nst.set_predicessor(Integer.toString(newID), newIP);
 	    	}
+	        // Else if the new ID is less than the local ID
+	        // and the new ID is less than the predecessor ID
+	        // and the predecessor is greater than the local ID
+	        else if (newID < myID && newID > predecessorID && myID < predecessorID) {
+	        	nst.set_predicessor(Integer.toString(newID), newIP);
+	        }
+	        // Else if the newID is greater than the local ID
+	        // and the new ID is greater than the predecessor ID
+	        else if (newID > myID && newID > predecessorID) {
+	        	nst.set_predicessor(Integer.toString(newID), newIP);
+	        }
 	    	
+	        // Loop through the search table and update it where needed
 	    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
 	    	for (int index = 0; index < nst.size(); index++) {
+	    		// Get the potential ID for the slot in the table
 	    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
+	    		// Get the current ID held at that location
 	    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
 	    		
-	    		if (newID > currSearchID && newID < potID) {
-	    			nst.set(index, Integer.toString(newID), newIP);
-	    		}
+    			// If the currSearchID is the same as myID
+    			if (currSearchID == myID) {
+    				nst.set(index, Integer.toString(newID), newIP);
+    			}
+    			// else if the new ID is between the current and potential
+    			else if (newID > potID && newID < currSearchID) {
+    				nst.set(index, Integer.toString(newID), newIP);
+    			}
+    			// else if the new ID is greater than the current and potential
+    			// but the current is less than my ID
+    			else if (newID > potID && newID > currSearchID && currSearchID < myID) {
+    				nst.set(index, Integer.toString(newID), newIP);
+    			}
+    			// else if the new ID is less than both the current and potential
+    			else if (newID < potID && newID < currSearchID) {
+    				nst.set(index, Integer.toString(newID), newIP);
+    			}
 	    	}
 	    	
+	    	// Send that the table has been updated
 	    	outStream.println(ConnectionCodes.SETUPSEARCHTABLE);
+	    	outStream.flush();
 	    	
+	    	// Close all streams and the client
 	    	outStream.close();
 	    	bos.close();
 	    	inStream.close();
