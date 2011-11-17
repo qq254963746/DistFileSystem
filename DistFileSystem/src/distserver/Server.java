@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ public class Server implements Runnable {
         
         try {
             this.sock = new ServerSocket(this.distConfig.get_servPortNumber());
+            this.sock.setSoTimeout(distConfig.getServertimeout());
         }
         catch (IOException e) {
             // The socket could not be created
@@ -141,7 +143,24 @@ public class Server implements Runnable {
                         enterDSST.start();
                         this.backgrounded.add(enterDSST);
                         enterDSST = null;
+                    case ConnectionCodes.GETFILE:
+                    	// Setup the appropriate class
+                        ServGetFile dsgf = 
+                                new ServGetFile(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSGF = new Thread (dsgf);
+                        enterDSGF.start();
+                        this.backgrounded.add(enterDSGF);
+                        enterDSGF = null;
                     case ConnectionCodes.SENDFILE:
+                    	// Setup the appropriate class
+                        ServUploadFile dsuf = 
+                                new ServUploadFile(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSUF = new Thread (dsuf);
+                        enterDSUF.start();
+                        this.backgrounded.add(enterDSUF);
+                        enterDSUF = null;
                         break;
                     case ConnectionCodes.UPDATETABLE:
                         break;
@@ -163,7 +182,6 @@ public class Server implements Runnable {
                         i -= 1;
                     }
                 }
-                
             }
             
             catch (NumberFormatException e) {
@@ -187,10 +205,15 @@ public class Server implements Runnable {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            catch (Throwable th) {
+            catch (SocketTimeoutException ste) {
                 // Something went wrong
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, th);
-            }
+                //Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, th);
+            	System.out.println("Client is null");
+            } 
+            catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
     

@@ -6,13 +6,12 @@ package distserver;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,12 +24,13 @@ import distfilelisting.LocalPathList;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 
-class ServGetFile implements Runnable {
+
+public class ServUploadFile implements Runnable {
 
 	private Socket client = null;
-	private DistConfig distConfig;
+	private DistConfig distConfig = null;
 	
-	public ServGetFile (Socket cli) {
+	public ServUploadFile (Socket cli) {
 		this.client = cli;
 	}
 	
@@ -45,18 +45,18 @@ class ServGetFile implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
+            // Create object input stream
+            ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
-            // Setup the object writer to the client
-            ObjectOutputStream oos = new ObjectOutputStream (bos);
             
             // Send acknowledgment everything is set
-            outStream.println(ConnectionCodes.GETFILE);
+            outStream.println(ConnectionCodes.SENDFILE);
             outStream.flush();
-            
+      
             // Get the file name
             String filename = inStream.readLine();
             
@@ -65,7 +65,8 @@ class ServGetFile implements Runnable {
             
             // Get the search table
             NodeSearchTable nst = NodeSearchTable.get_Instance();
-
+            
+            
             // Check if this is the correct server
             if (fileHash <= Integer.parseInt(nst.get_ownID()) &&
             		fileHash > Integer.parseInt(nst.get_predecessorID())) {
@@ -73,67 +74,68 @@ class ServGetFile implements Runnable {
             	outStream.println(ConnectionCodes.CORRECTPOSITION);
             	outStream.flush();
             	
-            	// Send each file individually
-                String fullPathName = distConfig.get_rootPath() + filename;
-                
-                // Check if the file exists and if the user has permissions
-                FileObject fileobj = LocalPathList.get_Instance().get_file(fullPathName);
-                boolean isAllowedAccess = false;
-                
-                if (fileobj == null) {
-                	outStream.println(ConnectionCodes.FILEDOESNTEXIST);
-                	outStream.flush();
-                }
-                else {
-                	File toTransfer = new File (fullPathName);
+            	FileObject filetoupload = (FileObject)ois.readObject();
+            	
+            	String username = filetoupload.getOwner();
+            	
+            	
+            	// Check if file already exists
+            	LocalPathList lpl = LocalPathList.get_Instance();
+            	FileObject localFile = lpl.get_file(filename);
+            	
+            	boolean isPermitted = false;
+            	
+            	if (localFile == null) {
+            		isPermitted = true;
+            	}
+            	else {
+            		Vector<String> groups = UserManagement.get_Instance().get_GroupsForUser(username);
                 	
-                	if (!toTransfer.exists()) {
-                		outStream.println(ConnectionCodes.FILEDOESNTEXIST);
-                		outStream.flush();
+                	if (username == localFile.getOwner()) {
+                		isPermitted = true;
                 	}
-                	else {
-	                	
-	                	outStream.println(ConnectionCodes.FILEEXISTS);
-	                	outStream.flush();
-	                	
-	                	String username = inStream.readLine();
-	                	Vector<String> groups = UserManagement.get_Instance().get_GroupsForUser(username);
-	                	
-	                	if (username == fileobj.getOwner()) {
-	                		isAllowedAccess = true;
-	                	}
-	                	else if (groups.contains(fileobj.getGroup())) {
-	                		if (fileobj.getGroupPermision() >= 4) {
-	                			isAllowedAccess = true;
-	                		}
-	                	}
-	                	else if (fileobj.getGlobalPermission() > 4) {
-	                		isAllowedAccess = true;
-	                	}
-	                	
-	                	if (!isAllowedAccess) {
-	                    	outStream.println(ConnectionCodes.NOTAUTHORIZED);
-	                    	outStream.flush();
-	                    }
-	                    else {
-	                    	outStream.println(ConnectionCodes.AUTHORIZED);
-	                    	outStream.flush();
-	                    	
-	                        FileInputStream fis = new FileInputStream(toTransfer);
-	                        byte[] buffer = new byte[distConfig.getBufferSize()];
-	                        
-	                        Integer bytesRead = 0;
-	                        while ((bytesRead = fis.read(buffer)) > 0) {
-	                        	oos.writeObject(bytesRead);
-	                        	oos.writeObject(Arrays.copyOf(buffer, buffer.length));
-	                        	oos.flush();
-	                        }
-	                        
-	                        // Get confirmation that it made it
-	                        inStream.readLine();
-	                    }
+                	else if (groups.contains(localFile.getGroup())) {
+                		if (localFile.getGroupPermision() >= 2 &&
+                				localFile.getGroupPermision() != 4 &&
+                				localFile.getGroupPermision() != 5) {
+                			isPermitted = true;
+                		}
                 	}
-                }
+                	else if (localFile.getGroupPermision() >= 2 && 
+                			localFile.getGroupPermision() != 4 && 
+                			localFile.getGroupPermision() != 5) {
+                		isPermitted = true;
+                	}
+            	}
+            	
+            	if (!isPermitted) {
+            		outStream.println(ConnectionCodes.NOTAUTHORIZED);
+            	}
+            	else {
+            		outStream.println(ConnectionCodes.AUTHORIZED);
+            		
+            		File newUpload = new File(DistConfig.get_Instance().get_rootPath() + filename);
+            		if (newUpload.exists()) {
+            			newUpload.delete();
+            		}
+            		
+            		int bytesRead = 0;
+            		byte [] buffer = new byte[distConfig.getBufferSize()];
+            		FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + filetoupload.getName());
+            		
+            		do {
+            			bytesRead = (Integer)ois.readObject();
+            			buffer = (byte[])ois.readObject();
+            			fos.write(buffer, 0, bytesRead);
+            		} while (bytesRead == distConfig.getBufferSize());
+            		
+            		fos.close();
+            		
+            		outStream.write(ConnectionCodes.RECEIVEDFILE);
+            		
+            		lpl.add(filetoupload);
+            	}
+            	
             }
             
             // else locate next server to check
@@ -176,14 +178,13 @@ class ServGetFile implements Runnable {
             	inStream.readLine();
             }
             
-                        
-            oos.close();
+            ois.close();
             outStream.close();
             inStream.close();
             client.close();
 		}
 		
-		catch (IOException ex) {
+		catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 		
