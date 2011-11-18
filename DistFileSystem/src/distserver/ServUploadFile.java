@@ -84,9 +84,14 @@ public class ServUploadFile implements Runnable {
             NodeSearchTable nst = NodeSearchTable.get_Instance();
             
             
-            // Check if this is the correct server
-            if (fileHash <= Integer.parseInt(nst.get_ownID()) &&
-            		fileHash > Integer.parseInt(nst.get_predecessorID())) {
+            // Check if this is the correct position.
+            // Is the file hash between the predecessor ID and this ID
+            // or equal to this ID
+            if (NodeSearchTable.is_between(
+            		fileHash, 
+            		Integer.parseInt(nst.get_predecessorID()), 
+            		Integer.parseInt(nst.get_ownID())) ||
+            		fileHash == Integer.parseInt(nst.get_ownID())) {
             	
             	// Send that this is the correct server
             	outStream.println(ConnectionCodes.CORRECTPOSITION);
@@ -109,6 +114,7 @@ public class ServUploadFile implements Runnable {
             	// If the file does exist
             	// Check to see if the user has permissions
             	else {
+            		// Get the groups to which the user belongs
             		Vector<String> groups = UserManagement.get_Instance().get_GroupsForUser(username);
                 	
             		// If the user owns the file, permit the upload
@@ -181,23 +187,10 @@ public class ServUploadFile implements Runnable {
             		int nextID = Integer.parseInt(nst.get_IDAt(index));
             		int secondID = Integer.parseInt(nst.get_IDAt(index + 1));
             		
-            		// Check if the file hash is greater than or equal to the current
-            		// and less than the next
-            		if (fileHash >= nextID && fileHash < secondID) {
-            			nextCheckID = nextID;
-            			nextCheckIP = nst.get_IPAt(index);
-            			continue;
-            		}
-            		// Check if the file hash is greater than or equal to the current
-            		// and greater than the next
-            		else if (fileHash >= nextID && fileHash > secondID) {
-            			nextCheckID = nextID;
-            			nextCheckIP = nst.get_IPAt(index);
-            			continue;
-            		}
-            		// Check if the file hash is less than or equal to the current
-            		// and less than the next
-            		else if (fileHash <= nextID && fileHash < secondID) {
+            		// Check if the file hash lies between the two elements of the search table
+            		// or if it is equal to one of them
+            		if (NodeSearchTable.is_between(fileHash, nextID, secondID) || 
+            				fileHash == nextID) {
             			nextCheckID = nextID;
             			nextCheckIP = nst.get_IPAt(index);
             			continue;
@@ -229,8 +222,6 @@ public class ServUploadFile implements Runnable {
 		// Catch any potential errors
 		catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
-        }
-		
+        }	
 	}
-	
 }

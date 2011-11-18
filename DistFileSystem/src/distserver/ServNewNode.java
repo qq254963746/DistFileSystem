@@ -1,4 +1,5 @@
 /**
+ * @author paul
 */
 
 package distserver;
@@ -16,19 +17,27 @@ import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distnodelisting.NodeSearchTable;
 
+/**
+ * When a new node is added, it sends to this part of the server
+ * so that the server can update it's search table
+ * @author paul
+ *
+ */
 public class ServNewNode implements Runnable {
 
 	private Socket client = null;
 	private NodeSearchTable nst = null;
 	
+	/**
+	 * 
+	 * @param cli : The socket to which the client is attached
+	 */
 	public ServNewNode (Socket cli) {
 		this.client = cli;
 	}
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-        
 		try {
 	        // Get the input stream for the client
 	        BufferedReader inStream = new BufferedReader (
@@ -39,7 +48,7 @@ public class ServNewNode implements Runnable {
 	        // Setup the writer to the client
 	        PrintWriter outStream = new PrintWriter(bos, false);
 	        
-	        // Send confirmation
+	        // Send confirmation of connection
 	        outStream.println(ConnectionCodes.NEWNODE);
 	        outStream.flush();
 	        
@@ -52,14 +61,19 @@ public class ServNewNode implements Runnable {
 	        outStream.println(ConnectionCodes.NEWNODE);
 	        outStream.flush();
 	        
+	        // Close the connection
 	        bos.close();
 	        outStream.close();
 	        inStream.close();
 	        client.close();
 	        
 	        int myID = Integer.parseInt(nst.get_ownID());
+	        // If the newID is not the same as this servers ID
+	        //		aka, it hasn't made it all the way around the network yet
 	        if (!(newID == myID)) {
+	        	// Alter the search table and send the newIP and newID along to the next server
 	        	this.pushNewIDAndIP(newID, newIP, myID);
+	        	// Send this node's information to the new node
 	        	this.sendOwnInfo(newIP);
 	        }
 		}
@@ -69,28 +83,42 @@ public class ServNewNode implements Runnable {
         }
 	}
 	
+	/**
+	 * This will update the local search table and pass the new ID and IP to the next successor
+	 * @param newID : The integer representation of the new node's ID
+	 * @param newIP : The string representation of the new node's IP
+	 * @param myID : The integer representation of this node's ID
+	 */
 	private void pushNewIDAndIP (int newID, String newIP, int myID) {
 		try {
-			if (newID < myID && newID > Integer.parseInt(nst.get_predecessorID())) {
+			// If the new ID is between my ID and the predecessor's ID,
+			// Set the new ID to be the predecessor
+			if (NodeSearchTable.is_between(newID, Integer.parseInt(nst.get_predecessorID()), myID) ||
+					myID == Integer.parseInt(nst.get_predecessorID())) {
 	    		nst.set_predicessor(Integer.toString(newID), newIP);
 	    	}
 	    	
+			// Loop through each element of the search table and check to see
+			// if the new ID fits in any of them
 	    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
 	    	for (int index = 0; index < nst.size(); index++) {
 	    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
 	    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
 	    		
-	    		if (newID > currSearchID && newID < potID) {
+	    		// If the new ID is between the potential ID for this slot
+	    		// and the current ID set to this slot, then set it.
+	    		if (NodeSearchTable.is_between(newID, potID, currSearchID)) {
 	    			nst.set(index, Integer.toString(newID), newIP);
 	    		}
 	    	}
 	    	
+	    	// Setup the socket to the next node, and the write and read buffers
 	    	Socket sock = new Socket(nst.get_IPAt(0), DistConfig.get_Instance().get_servPortNumber());
-	        
 	        sock.setSoTimeout(5000);
+	        // write buffer
 	        BufferedOutputStream bos = new BufferedOutputStream (sock.getOutputStream());
 			PrintWriter outStream = new PrintWriter(bos, false);
-			
+			// read buffer
 			BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(sock.getInputStream()));
 					
@@ -109,6 +137,7 @@ public class ServNewNode implements Runnable {
 			// receive confirmation
 			inStream.readLine();
 			
+			// Close the connection
 			inStream.close();
 			bos.close();
 			outStream.close();
@@ -120,14 +149,19 @@ public class ServNewNode implements Runnable {
         }
 	}
 	
+	/**
+	 * 
+	 * @param newIP : The string representation of the IP for the new node
+	 */
 	private void sendOwnInfo(String newIP) {
 		try {
+			// Setup the socket for the new node and input and output buffers
 			Socket sock = new Socket(newIP, DistConfig.get_Instance().get_servPortNumber());
-	        
 	        sock.setSoTimeout(5000);
+	        // output buffer
 	        BufferedOutputStream bos = new BufferedOutputStream (sock.getOutputStream());
 			PrintWriter outStream = new PrintWriter(bos, false);
-			
+			// input buffer
 			BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(sock.getInputStream()));
 					
@@ -146,6 +180,7 @@ public class ServNewNode implements Runnable {
 			// receive confirmation
 			inStream.readLine();
 			
+			// Close connection
 			inStream.close();
 			bos.close();
 			outStream.close();
