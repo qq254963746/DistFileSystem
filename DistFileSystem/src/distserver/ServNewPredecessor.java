@@ -1,4 +1,5 @@
 /**
+ * @author paul
 */
 
 package distserver;
@@ -23,24 +24,28 @@ import distfilelisting.FileObject;
 import distfilelisting.LocalPathList;
 import distnodelisting.NodeSearchTable;
 
-
-
-
+/**
+ * This is called when a new node becomes this nodes predecessor
+ * @author paul
+ *
+ */
 public class ServNewPredecessor implements Runnable {
 	
 	private Socket client = null;
 	private DistConfig distConfig = null;
 	
+	/**
+	 * 
+	 * @param cli : The socket the client is attached to
+	 */
 	public ServNewPredecessor (Socket cli) {
 		this.client = cli;
 	}
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
 		try {
-			System.out.println("In thread for check position");
+			System.out.println("In thread for new predecessor");
             this.distConfig = DistConfig.get_Instance();
             
             // Get the input stream for the client
@@ -61,10 +66,12 @@ public class ServNewPredecessor implements Runnable {
             // Get the ID of the new Predecessor
             int newPredID = Integer.parseInt(inStream.readLine());
             
+            // Get the list of files that will be transfered to the new node
             Vector<FileObject> filesToTransfer = LocalPathList.get_Instance().get_filesBetween(
             		newPredID, 
-            		Integer.parseInt(NodeSearchTable.get_Instance().get_ownID()));
+            		Integer.parseInt(NodeSearchTable.get_Instance().get_IDAt(0)));
             
+            // Send the list of files to be transfered
             oos.writeObject(filesToTransfer);
             oos.flush();
             
@@ -72,14 +79,18 @@ public class ServNewPredecessor implements Runnable {
             inStream.readLine();
             
             // Send each file individually
+            // Loop through each file in the transfer set an send them to the new client
             for (int index = 0; index < filesToTransfer.size(); index++) {
+            	// Get the name of the file to transfer
             	String fileName = filesToTransfer.get(index).getName();
             	
+            	// Open the file and setup the input stream
             	File toTransfer = new File (fileName);
             	FileInputStream fis = new FileInputStream(toTransfer);
             	byte[] buffer = new byte[distConfig.getBufferSize()];
             	
             	Integer bytesRead = 0;
+            	// Read the bytes from the file, sending them to the client
             	while ((bytesRead = fis.read(buffer)) > 0) {
             		oos.writeObject(bytesRead);
             		oos.writeObject(Arrays.copyOf(buffer, buffer.length));
@@ -92,6 +103,8 @@ public class ServNewPredecessor implements Runnable {
             
             // Remove the files from the directory and list
             LocalPathList lpl = LocalPathList.get_Instance();
+            // Loop through the list of files to send, removing them from the
+            // local disk and local list of files
             for (int index = 0; index < filesToTransfer.size(); index++) {
             	String fileName = filesToTransfer.get(index).getName();
             	File toDelete = new File (fileName);

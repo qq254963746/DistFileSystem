@@ -90,23 +90,11 @@ class ServSetupSearchTable implements Runnable {
 	    		// Get the current ID held at that location
 	    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
 	    		
-    			// If the currSearchID is the same as myID
-    			if (currSearchID == myID) {
-    				nst.set(index, Integer.toString(newID), newIP);
-    			}
-    			// else if the new ID is between the current and potential
-    			else if (newID > potID && newID < currSearchID) {
-    				nst.set(index, Integer.toString(newID), newIP);
-    			}
-    			// else if the new ID is greater than the current and potential
-    			// but the current is less than my ID
-    			else if (newID > potID && newID > currSearchID && currSearchID < myID) {
-    				nst.set(index, Integer.toString(newID), newIP);
-    			}
-    			// else if the new ID is less than both the current and potential
-    			else if (newID < potID && newID < currSearchID) {
-    				nst.set(index, Integer.toString(newID), newIP);
-    			}
+	    		// if the new ID is between the potential ID and the current ID
+	    		// in the slot update it
+	    		if (NodeSearchTable.is_between(newID, potID, currSearchID)) {
+	    			nst.set(index, Integer.toString(newID), newIP);
+	    		}
 	    	}
 	    	
 	    	// Send that the table has been updated
