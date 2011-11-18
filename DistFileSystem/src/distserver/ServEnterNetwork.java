@@ -52,7 +52,7 @@ public class ServEnterNetwork implements Runnable {
                     Level.INFO, null, 
                     "In thread to connect a new node to the netwrok");
             
-            // Get the intput stream for the client
+            // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
             // Get the output stream for the client
@@ -68,7 +68,7 @@ public class ServEnterNetwork implements Runnable {
             oos.writeObject(distConf);
             oos.flush();
             
-            // Wait to recieve an acknowledgement before sending the next item
+            // Wait to receive an acknowledgment before sending the next item
             inStream.readLine();
             
             // Get the client IP address and create the hash
@@ -94,7 +94,7 @@ public class ServEnterNetwork implements Runnable {
             outStream.println(Integer.toString(newClientID));
             outStream.flush();
             
-            // Wait to recieve an acknowledgment and request for next item
+            // Wait to receive an acknowledgment and request for next item
             inStream.readLine();
             
             // If the configuration states to use the entire table,
@@ -155,7 +155,7 @@ public class ServEnterNetwork implements Runnable {
                 outStream.flush();
             }
             
-            // Wait for acknowledgement of receipt
+            // Wait for acknowledgment of receipt
             inStream.readLine();
             
             // Finished setting up the new client, close all connections
@@ -167,7 +167,7 @@ public class ServEnterNetwork implements Runnable {
             
         } catch (IOException ex) {
             try {
-                // Somehting went wrong with IO to the client
+                // Something went wrong with IO to the client
                 client.close();
             } catch (IOException ex1) {
                 Logger.getLogger(ServEnterNetwork.class.getName()).log(Level.SEVERE, null, ex1);

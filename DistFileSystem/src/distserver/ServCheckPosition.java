@@ -84,9 +84,9 @@ public class ServCheckPosition implements Runnable {
             // Check if the new node's ID is between the current ID and the next
             int nextID = Integer.parseInt(dct.get_IDAt(0));
             // If the new ID is between this ID and the next
-            if ((newID > id && newID < nextID) || 
-                    (id > nextID && newID > id && newID > nextID) ||
-                    (id > nextID && newID < id && newID < nextID)) {
+            if ((id < newID && newID < nextID) || 
+                    (nextID < id && id < newID) ||
+                    (newID < nextID && nextID < id)) { 
                 // Send CORRECTPOSITION message
                 outStream.println(ConnectionCodes.CORRECTPOSITION);
                 outStream.flush();
