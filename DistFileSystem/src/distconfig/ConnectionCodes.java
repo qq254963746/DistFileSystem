@@ -14,7 +14,7 @@ public class ConnectionCodes {
     public static final int ENTERNETWORK = 1;
     public static final int NEWSUCCESSOR = 2;
     public static final int NEWPREDECESSOR = 3;
-    public static final int SENDFILE = 4;
+    public static final int UPLOADFILE = 4;
     public static final int RECEIVEDFILE = 5;
     public static final int UPDATETABLE = 6;
     public static final int CHECKPOSITION = 7;
@@ -28,6 +28,7 @@ public class ConnectionCodes {
     public static final int FILEEXISTS = 15;
     public static final int NOTAUTHORIZED = 16;
     public static final int AUTHORIZED = 17;
+    public static final int HEARTBEAT = 18;
     
     // Error Codes
     public static final int UNRECOGNIZEDCODE = 900;

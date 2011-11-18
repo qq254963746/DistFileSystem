@@ -3,6 +3,8 @@
 
 package distfilelisting;
 
+import java.util.Date;
+
 import distconfig.Sha1Generator;
 
 
@@ -15,6 +17,7 @@ public class FileObject {
 	private int groupPermission;
 	private int globalPermission;
 	private boolean isDirectory;
+	private Date lastupdate;
 	private int hash;
 	
 	public FileObject (String name, boolean isDirectory, int ownerPerm, 
@@ -28,6 +31,7 @@ public class FileObject {
 		this.owner = reqUser;
 		this.group = defGroup;
 		this.set_hash(Sha1Generator.generate_Sha1(this.name));
+		this.lastupdate = new Date();
 	}
 	
 	public String getName() {
@@ -55,6 +59,7 @@ public class FileObject {
 			retval[0] = "1";
 			retval[1] = "Owner of " + this.name +
 					", changed to " + newOwner;
+			this.lastupdate = new Date();
 		}
 		
 		return retval;
@@ -83,6 +88,7 @@ public class FileObject {
 			retval[0] = "1";
 			retval[1] = "Group has been changed to " + newGroup;
 			this.group = newGroup;
+			this.lastupdate = new Date();
 		}
 				
 		return retval;
@@ -143,6 +149,8 @@ public class FileObject {
 					Integer.toString(this.ownerPermission) +
 					Integer.toString(this.groupPermission) +
 					Integer.toString(this.globalPermission);
+			
+			this.lastupdate = new Date();
 		}
 		
 		return retval;
@@ -169,5 +177,20 @@ public class FileObject {
 
 	public void set_hash(int hash) {
 		this.hash = hash;
+		this.lastupdate = new Date();
+	}
+
+	/**
+	 * @return the date this file was last updated
+	 */
+	public Date getLastupdate() {
+		return lastupdate;
+	}
+
+	/**
+	 * @param lastupdate the date this file was last updated to set
+	 */
+	public void setLastupdate(Date lastupdate) {
+		this.lastupdate = lastupdate;
 	}
 }

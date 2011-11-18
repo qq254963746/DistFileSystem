@@ -71,7 +71,7 @@ public class ServUploadFile implements Runnable {
             PrintWriter outStream = new PrintWriter(bos, false);
             
             // Send acknowledgment everything is set
-            outStream.println(ConnectionCodes.SENDFILE);
+            outStream.println(ConnectionCodes.UPLOADFILE);
             outStream.flush();
       
             // Get the file name

@@ -85,7 +85,7 @@ public class ServNewPredecessor implements Runnable {
             	String fileName = filesToTransfer.get(index).getName();
             	
             	// Open the file and setup the input stream
-            	File toTransfer = new File (fileName);
+            	File toTransfer = new File (distConfig.get_rootPath() + fileName);
             	FileInputStream fis = new FileInputStream(toTransfer);
             	byte[] buffer = new byte[distConfig.getBufferSize()];
             	
@@ -107,7 +107,7 @@ public class ServNewPredecessor implements Runnable {
             // local disk and local list of files
             for (int index = 0; index < filesToTransfer.size(); index++) {
             	String fileName = filesToTransfer.get(index).getName();
-            	File toDelete = new File (fileName);
+            	File toDelete = new File (distConfig.get_rootPath() + fileName);
             	toDelete.delete();
             	lpl.remove(filesToTransfer.get(index));
             }

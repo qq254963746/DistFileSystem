@@ -99,7 +99,7 @@ class ServGetFile implements Runnable {
                 String fullPathName = distConfig.get_rootPath() + filename;
                 
                 // Check if the file exists and if the user has permissions
-                FileObject fileobj = LocalPathList.get_Instance().get_file(fullPathName);
+                FileObject fileobj = LocalPathList.get_Instance().get_file(filename);
                 boolean isAllowedAccess = false;
                 
                 // Test if the file doesn't exist

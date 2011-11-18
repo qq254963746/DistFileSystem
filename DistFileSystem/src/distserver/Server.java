@@ -152,7 +152,7 @@ public class Server implements Runnable {
                         enterDSGF.start();
                         this.backgrounded.add(enterDSGF);
                         enterDSGF = null;
-                    case ConnectionCodes.SENDFILE:
+                    case ConnectionCodes.UPLOADFILE:
                     	// Setup the appropriate class
                         ServUploadFile dsuf = 
                                 new ServUploadFile(client);
@@ -161,8 +161,6 @@ public class Server implements Runnable {
                         enterDSUF.start();
                         this.backgrounded.add(enterDSUF);
                         enterDSUF = null;
-                        break;
-                    case ConnectionCodes.UPDATETABLE:
                         break;
                     default:
                         NumberFormatException nfe =
@@ -206,8 +204,9 @@ public class Server implements Runnable {
                 }
             }
             catch (SocketTimeoutException ste) {
-                // Something went wrong
-                //Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, th);
+            	// The server socket connection timed out
+            	// check to see if the successor is still there
+            	// if it is than ask for any new files
             	System.out.println("Client is null");
             } 
             catch (Exception e) {
@@ -227,7 +226,7 @@ public class Server implements Runnable {
         dct.add("15", "15.15.15.15");
         dct.add("20", "20.20.20.20");
         dct.add("25", "25.25.25.25");
-        //dct.add("3", "3.3.3.3");
+        dct.add("3", "3.3.3.3");
         dct.set_predicessor("0", "0.0.0.0");
         
         System.out.println("own = " + dct.get_ownID());
