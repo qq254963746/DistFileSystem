@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.Vector;
 
 import distconfig.DistConfig;
+import distnodelisting.NodeSearchTable;
 
 
 
@@ -62,12 +63,31 @@ public class LocalPathList extends Vector<FileObject> {
 		return null;
 	}
 	
+	public FileObject set_file (FileObject fo) {
+		String fileName = fo.getName();
+		
+		for(int index = 0; index < this.size(); index++) {
+			if (this.get(index).getName().equals(fileName)) {
+				FileObject prevObj = this.get(index);
+				this.set(index, fo);
+				return prevObj;
+			}
+		}
+		
+		this.add(fo);
+		return fo;
+	}
+	
 	public Vector<FileObject> get_filesBetween(int lowerHash, int upperHash) {
 		Vector<FileObject> retval = new Vector<FileObject>();
 		
-		for(int index = 0; index < this.size(); index++) {
-			if (this.get(index).get_hash() > lowerHash &&
-					this.get(index).get_hash() < upperHash) {
+		// Loop through every file in this vector and check if it is between
+		// the two hashes, or equal to the upper hash
+		for (int index = 0; index < this.size(); index++) {
+			if (NodeSearchTable.is_between(
+					this.get(index).get_hash(), 
+					lowerHash, upperHash) ||
+					this.get(index).get_hash() == upperHash) {
 				retval.add(this.get(index));
 			}
 		}
