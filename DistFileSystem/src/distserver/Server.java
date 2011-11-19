@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,6 +163,36 @@ public class Server implements Runnable {
                         this.backgrounded.add(enterDSUF);
                         enterDSUF = null;
                         break;
+                    case ConnectionCodes.HEARTBEAT:
+                    	// Setup the appropriate class
+                        ServHeartBeat dshb = 
+                                new ServHeartBeat(client, false);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSHB = new Thread (dshb);
+                        enterDSHB.start();
+                        this.backgrounded.add(enterDSHB);
+                        enterDSHB = null;
+                        break;
+                    case ConnectionCodes.PREDDROPPED:
+                    	// Setup the appropriate class
+                        ServPredecessorDropped dspd = 
+                                new ServPredecessorDropped(client, false);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSPD = new Thread (dspd);
+                        enterDSPD.start();
+                        this.backgrounded.add(enterDSPD);
+                        enterDSPD = null;
+                        break;
+                    case ConnectionCodes.NODEDROPPED:
+                    	// Setup the appropriate class
+                        ServNodeDropped dsnd = 
+                                new ServNodeDropped(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSND = new Thread (dsnd);
+                        enterDSND.start();
+                        this.backgrounded.add(enterDSND);
+                        enterDSND = null;
+                        break;
                     default:
                         NumberFormatException nfe =
                                 new NumberFormatException();
@@ -203,11 +234,98 @@ public class Server implements Runnable {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            
+            // Check if the successor is still alive after a given amount of time
             catch (SocketTimeoutException ste) {
             	// The server socket connection timed out
             	// check to see if the successor is still there
             	// if it is than ask for any new files
-            	// TODO: Add code to run the heartbeat and handle if it fails
+            	NodeSearchTable nst = NodeSearchTable.get_Instance();
+            	Socket sock;
+				try {
+					// Attempt to establish a connection
+					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
+					sock.setSoTimeout(5000);
+					
+					// If the connection completes, run the heart beat
+					BufferedOutputStream bos = new BufferedOutputStream (sock.getOutputStream());
+					PrintWriter outStream = new PrintWriter(bos, false);
+					
+					outStream.println(ConnectionCodes.HEARTBEAT);
+					outStream.flush();
+					
+					// Setup the new thread and start
+					// the heartbeat thread in the background
+					ServHeartBeat dshb = new ServHeartBeat(sock, false);
+					Thread enterDSHB = new Thread (dshb);
+                    enterDSHB.start();
+                    this.backgrounded.add(enterDSHB);
+                    enterDSHB = null;
+                    
+				} 
+				// If the successor is not alive
+				catch (SocketTimeoutException e) {
+					Socket newpred;
+					try {	
+						// Send out message that predecessor failed
+						newpred = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						newpred.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						BufferedOutputStream bos = new BufferedOutputStream (newpred.getOutputStream());
+						PrintWriter outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.PREDDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring in the background
+						ServPredecessorDropped dspd =
+								new ServPredecessorDropped(newpred, true);
+						Thread enterDSPD = new Thread(dspd);
+						enterDSPD.start();
+						this.backgrounded.add(enterDSPD);
+						enterDSPD = null;
+						
+						outStream.close();
+						bos.close();
+						
+						//
+						// Send out signal that the node has failed
+						//
+						Socket nodefail = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						nodefail.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						bos = new BufferedOutputStream (nodefail.getOutputStream());
+						outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.NODEDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring the information for the node that dropped
+						ServNodeDropped dsnd =
+								new ServNodeDropped(nodefail, false);
+						Thread enterDSND = new Thread(dsnd);
+						enterDSND.start();
+						this.backgrounded.add(enterDSND);
+						enterDSND = null;
+						
+						outStream.close();
+						bos.close();
+					}
+					catch (Exception we) {
+						we.printStackTrace();
+					}
+				}
+				catch (UnknownHostException e) {
+					e.printStackTrace();
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+    	        
             	System.out.println("Client is null");
             } 
             catch (Exception e) {

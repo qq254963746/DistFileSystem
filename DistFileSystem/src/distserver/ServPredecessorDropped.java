@@ -21,15 +21,26 @@ public class ServPredecessorDropped implements Runnable {
 	
 	private Socket client = null;
 	private NodeSearchTable nst = null;
+	private boolean is_predecessor = false;
 	
-	public ServPredecessorDropped (Socket cli) {
+	public ServPredecessorDropped (Socket cli, boolean is_pred) {
 		this.client = cli;
+		this.is_predecessor = is_pred;
 	}
 	
 
 	@Override
 	public void run() {
+		if (!this.is_predecessor) {
+			this.runas_successor();
+		}
+		else {
+			this.runas_predecessor();
+		}
+	}
 		
+	
+	private void runas_successor () {
 		nst = NodeSearchTable.get_Instance();
 		try {
 	        // Get the input stream for the client
@@ -55,6 +66,42 @@ public class ServPredecessorDropped implements Runnable {
 	        ServHeartBeat shb = new ServHeartBeat(this.client, true);
 	        shb.runas_server(false);
 	        shb.runas_client();
+	        
+	        // close the connections
+	        inStream.close();
+	        outStream.close();
+	        bos.close();
+	        this.client.close();
+	        
+		}
+		catch (IOException ex) {
+            Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+        }
+	}
+	
+	private void runas_predecessor () {
+		nst = NodeSearchTable.get_Instance();
+		try {
+	        // Get the input stream for the client
+	        BufferedReader inStream = new BufferedReader (
+	                new InputStreamReader(client.getInputStream()));
+	        // Get the output stream for the client
+	        BufferedOutputStream bos = new BufferedOutputStream (
+	                client.getOutputStream());
+	        // Setup the writer to the client
+	        PrintWriter outStream = new PrintWriter(bos, false);
+	        
+	        // Receive Confirmation
+	        inStream.readLine();
+	        
+	        // Send own ID
+	        outStream.println(nst.get_ownID());
+	        outStream.flush();
+	        
+	        // Exchange Files
+	        ServHeartBeat shb = new ServHeartBeat(this.client, true);
+	        shb.runas_client();
+	        shb.runas_server(true);
 	        
 	        // close the connections
 	        inStream.close();
