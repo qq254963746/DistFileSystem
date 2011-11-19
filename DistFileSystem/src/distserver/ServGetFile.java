@@ -83,7 +83,7 @@ class ServGetFile implements Runnable {
             }
             // If this is the backup server, and the file lies between this node and its successor
             // or is equal to the successors ID, then this is the correct node
-            else if (is_backup != 1 &&
+            else if (is_backup != 0 &&
             		(NodeSearchTable.is_between(fileHash, Integer.parseInt(nst.get_ownID()), Integer.parseInt(nst.get_IDAt(0))) ||
             				fileHash == Integer.parseInt(nst.get_IDAt(0)))) {
             	is_correct = true;
