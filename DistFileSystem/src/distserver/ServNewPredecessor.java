@@ -80,9 +80,9 @@ public class ServNewPredecessor implements Runnable {
             
             // Send each file individually
             // Loop through each file in the transfer set an send them to the new client
-            for (int index = 0; index < filesToTransfer.size(); index++) {
+            for (FileObject f : filesToTransfer) {
             	// Get the name of the file to transfer
-            	String fileName = filesToTransfer.get(index).getName();
+            	String fileName = f.getName();
             	
             	// Open the file and setup the input stream
             	File toTransfer = new File (distConfig.get_rootPath() + fileName);
@@ -105,11 +105,11 @@ public class ServNewPredecessor implements Runnable {
             LocalPathList lpl = LocalPathList.get_Instance();
             // Loop through the list of files to send, removing them from the
             // local disk and local list of files
-            for (int index = 0; index < filesToTransfer.size(); index++) {
-            	String fileName = filesToTransfer.get(index).getName();
+            for (FileObject f : filesToTransfer) {
+            	String fileName = f.getName();
             	File toDelete = new File (distConfig.get_rootPath() + fileName);
             	toDelete.delete();
-            	lpl.remove(filesToTransfer.get(index));
+            	lpl.remove(f);
             }
             
             // Add the new predecessor to search list
