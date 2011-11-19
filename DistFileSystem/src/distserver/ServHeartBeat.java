@@ -51,7 +51,7 @@ public class ServHeartBeat implements Runnable {
 	@Override
 	public void run() {
 		if (is_serv)
-			this.runas_server();
+			this.runas_server(false);
 		
 		else
 			this.runas_client();
@@ -69,7 +69,7 @@ public class ServHeartBeat implements Runnable {
 	 * Then send those necessary to be updated
 	 */
 	@SuppressWarnings("unchecked")
-	public void runas_server () {
+	public void runas_server (boolean is_predecessor) {
 		// Setup global parameters
 		this.distConfig = DistConfig.get_Instance();
 		this.nst = NodeSearchTable.get_Instance();
@@ -96,8 +96,15 @@ public class ServHeartBeat implements Runnable {
 	        // Get ID of the connecting server
 	        int prevID = Integer.parseInt(inStream.readLine());
 	        
+	        Vector<FileObject> filestosend = new Vector<FileObject>();
+	        
 	        // Send the list of files contained on this server
-	        Vector<FileObject> filestosend = lpl.get_filesBetween(prevID, Integer.parseInt(nst.get_ownID()));
+	        if (!is_predecessor) {
+	        	filestosend = lpl.get_filesBetween(prevID, Integer.parseInt(nst.get_ownID()));
+	        }
+	        else {
+	        	filestosend = lpl.get_filesBetween(Integer.parseInt(nst.get_ownID()), prevID);
+	        }
 	        oos.writeObject(filestosend);
 	        oos.flush();
 	        

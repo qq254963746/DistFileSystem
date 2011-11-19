@@ -207,10 +207,10 @@ public class Server implements Runnable {
             	// The server socket connection timed out
             	// check to see if the successor is still there
             	// if it is than ask for any new files
+            	// TODO: Add code to run the heartbeat and handle if it fails
             	System.out.println("Client is null");
             } 
             catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
