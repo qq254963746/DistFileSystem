@@ -3,6 +3,7 @@ package distclient;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -15,6 +16,7 @@ public abstract class Client {
 	private PrintWriter outStream;
 	private Socket sock;
 	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
 	private int id;
 	private int servId;
     private String servIp;
@@ -97,6 +99,12 @@ public abstract class Client {
 	}
 	public void addTask(Runnable task) {
 		tm.addTask(task);
+	}
+	public ObjectOutputStream getOos() {
+		return oos;
+	}
+	public void setOos(ObjectOutputStream oos) {
+		this.oos = oos;
 	}
 	
 

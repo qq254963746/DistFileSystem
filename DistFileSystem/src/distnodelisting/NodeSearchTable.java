@@ -6,6 +6,8 @@ package distnodelisting;
 
 import java.util.Vector;
 
+import distconfig.Constants;
+
 /**
  *
  * @author paul
@@ -15,8 +17,6 @@ public class NodeSearchTable extends Vector<String[]> {
     /**
 	 * 
 	 */
-	private static final int ID = 0;
-	private static final int IPADDRESS = 1;
 	
 	private static final long serialVersionUID = 1L;
 	private static NodeSearchTable dctInstance = null;
@@ -39,11 +39,11 @@ public class NodeSearchTable extends Vector<String[]> {
     }
     
     public String get_ownID () {
-        return this.own[ID];
+        return this.own[Constants.ID];
     }
     
     public String get_ownIPAddress () {
-        return this.own[IPADDRESS];
+        return this.own[Constants.IP_ADDRESS];
     }
     
     public void set_predicessor(String id, String ipAddress) {
@@ -52,11 +52,11 @@ public class NodeSearchTable extends Vector<String[]> {
     }
     
     public String get_predecessorID () {
-        return this.predecessor[ID];
+        return this.predecessor[Constants.ID];
     }
     
     public String get_predecessorIPAddress () {
-        return this.predecessor[IPADDRESS];
+        return this.predecessor[Constants.IP_ADDRESS];
     }
     
     public void add(String id, String ipAddress) {
@@ -71,12 +71,12 @@ public class NodeSearchTable extends Vector<String[]> {
     
     public String get_IDAt(int index) {
         String[] idip = (String[]) super.get(index);
-        return idip[ID];
+        return idip[Constants.ID];
     }
     
     public String get_IPAt(int index) {
         String[] idip = (String[]) super.get(index);
-        return idip[IPADDRESS];
+        return idip[Constants.IP_ADDRESS];
     }
     
     public Object remove_NodeAt (int index) {
@@ -88,7 +88,7 @@ public class NodeSearchTable extends Vector<String[]> {
     }
     
     public boolean contains_ID (int id) {
-        return this.contains_ID(Integer.toString(ID));
+        return this.contains_ID(Integer.toString(Constants.ID));
     }
     
     public boolean contains_ID (String id) {

@@ -2,30 +2,32 @@ package distclient;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Vector;
 
 import distconfig.ConnectionCodes;
 import distconfig.Constants;
 import distconfig.DistConfig;
+import distfilelisting.FileObject;
+import distfilelisting.LocalPathList;
 
-public class ClntCheckPosition implements Runnable {
+public class ClntNewPredecessor implements Runnable {
 	private String host;
 	private Client client;
 	private int id;
 	
-	public ClntCheckPosition(String host, Client client){
-		this(host, client.getId(), client);
+	public ClntNewPredecessor(Client client){
+		this(client.getSuccessor()[Constants.IP_ADDRESS], client);
 	}
 	
-	public ClntCheckPosition(String host, int id, Client client){
+	public ClntNewPredecessor(String host, Client client){
 		this.host = host;
 		this.client = client;
-		this.id = id;
-				
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class ClntCheckPosition implements Runnable {
 	
 	        
 	        System.out.println("Sending Code");
-	        outStream.println(ConnectionCodes.CHECKPOSITION);
+	        outStream.println(ConnectionCodes.NEWPREDECESSOR);
 	        outStream.flush();
 	        
 	        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
@@ -68,41 +70,44 @@ public class ClntCheckPosition implements Runnable {
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
-	        System.out.println("Sending my ID as " + id);
+	        System.out.println("Sending my ID as " + client.getId());
 	        outStream.println(Integer.toString(id));
 	        outStream.flush();
 	        
-	        String tmpline = in.readLine();
+	        Vector<FileObject> vfo = (Vector<FileObject>) ois.readObject();
 	        
-	        if (Integer.parseInt(tmpline) == ConnectionCodes.NEWID) {
-	            id = Integer.parseInt(in.readLine());
-	            client.setId(id);
-	            System.out.println("New ID = " + id);
-	            tmpline = in.readLine();
+	        System.out.println("Sending confirm");
+	        outStream.println(ConnectionCodes.NEWPREDECESSOR);
+	        outStream.flush();        
+	        
+	        for (FileObject f : vfo) {
+	        	   
+	        	FileOutputStream fos;
+	          	byte [] buffer = new byte[distConfig.getBufferSize()];  
+	        	      
+	            fos = new FileOutputStream(distConfig.get_rootPath() + f.getName());
+	        
+	            Integer bytesRead = 0;  
+	      
+	            do {        
+	                bytesRead = (Integer)ois.readObject(); 	      
+	                buffer = (byte[])ois.readObject();  
+	      
+	                fos.write(buffer, 0, bytesRead);  
+	            } while (bytesRead == distConfig.getBufferSize());  
+	      
+	            fos.close();
+		        LocalPathList.get_Instance().add(f);
+	            
+	            System.out.println("Sending file receipt");
+		        outStream.println(ConnectionCodes.NEWPREDECESSOR);
+		        outStream.flush();
 	        }
 	        
-	        if ( Integer.parseInt(tmpline) == ConnectionCodes.CORRECTPOSITION) {
-	            String[] predecessor = (String[])ois.readObject();
-	            System.out.println("Correct Position");
-	            System.out.println("Pred ID = " + predecessor[Constants.ID]);
-	            System.out.println("Pred IP = " + predecessor[Constants.IP_ADDRESS]);
-	            String[] successor = (String[])ois.readObject();
-	            System.out.println("Next ID = " + successor[Constants.ID]);
-	            System.out.println("Next IP = " + successor[Constants.IP_ADDRESS]);
-	            client.setPredecessor(predecessor);
-	            client.setSuccessor(successor);
-	        } else {
-	        	
-	            int nextTestId = Integer.parseInt(in.readLine());
-	            client.setNextTestId(nextTestId);
-	            
-	            String nextTestIp = in.readLine();
-	            client.setNextTestIp(nextTestIp);
-	            
-	            System.out.println("Wrong Position");
-	            System.out.println("next ID = " + nextTestId);
-	            System.out.println("next IP = " + nextTestIp);
-	        }
+
+	        System.out.println("Getting Ack");
+	        System.out.println(in.readLine());
+	        
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
