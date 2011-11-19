@@ -55,12 +55,6 @@ public class ServHeartBeat implements Runnable {
 		
 		else
 			this.runas_client();
-		
-        try {
-			client.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -69,7 +63,7 @@ public class ServHeartBeat implements Runnable {
 	 * Then send those necessary to be updated
 	 */
 	@SuppressWarnings("unchecked")
-	public void runas_server () {
+	private void runas_server () {
 		// Setup global parameters
 		this.distConfig = DistConfig.get_Instance();
 		this.nst = NodeSearchTable.get_Instance();
@@ -136,6 +130,7 @@ public class ServHeartBeat implements Runnable {
 	        bos.close();
 	        ois.close();
 	        inStream.close();
+	        client.close();
 		}
 		
 		catch (IOException | ClassNotFoundException ex) {
@@ -149,92 +144,93 @@ public class ServHeartBeat implements Runnable {
 	 * Then receive those files necissary for updating
 	 */
 	@SuppressWarnings("unchecked")
-	public void runas_client () {
+	private void runas_client () {
 		// Setup global parameters
-		this.distConfig = DistConfig.get_Instance();
-		this.nst = NodeSearchTable.get_Instance();
-		this.lpl = LocalPathList.get_Instance();
-		
-		try {
-			// Get the input stream for the server
-	        BufferedReader inStream = new BufferedReader (
-	                new InputStreamReader(client.getInputStream()));
-	        // Get the output stream for the server
-	        BufferedOutputStream bos = new BufferedOutputStream (
-	                client.getOutputStream());
-	        // Setup the writer to the server
-	        PrintWriter outStream = new PrintWriter(bos, false);
-	        
-	        // Setup the object input stream
-	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
-	        // Setup the object writer to the server
-	        ObjectOutputStream oos = new ObjectOutputStream (bos);
-	        
-	        // Receive acknowledgment and send ID
-	        inStream.readLine();
-	        outStream.println(nst.get_ownID());
-	        outStream.flush();
-	        
-	        // Receive the list of files on the server
-	        Vector<FileObject> filesToReceive = (Vector<FileObject>)ois.readObject();
-	        
-	        // Get the list of files that need updating
-	        Vector<FileObject> tmpFilesToReceive = new Vector<FileObject>();
-	        FileObject tmpFO = null;
-	        for (int index = 0; index < filesToReceive.size(); index++) {
-	        	tmpFO = lpl.get_file(filesToReceive.get(index).getName());
-	        	// If the file currently doesn't exist on this node
-	        	if (tmpFO == null) {
-	        		tmpFilesToReceive.add(filesToReceive.get(index));
-	        	}
-	        	// Or if it is out of date
-	        	else if (tmpFO.getLastupdate().before(filesToReceive.get(index).getLastupdate())) {
-	        		tmpFilesToReceive.add(filesToReceive.get(index));
-	        	}
-	        }
-	        
-	        // Send the needed files
-	        oos.writeObject(tmpFilesToReceive);
-	        oos.flush();
-	        
-	        // loop through the files to receive
-	        for (int index = 0; index < tmpFilesToReceive.size(); index++) {
-	        	// Get the file name
-	        	String filename = inStream.readLine();
-	        	
-	        	// Open the file to write to it
-	        	File toReceive = new File (distConfig.get_rootPath() + filename);
-	        	FileOutputStream fos = new FileOutputStream(toReceive);
-	        	byte[] buffer = new byte[distConfig.getBufferSize()];
-	        	
-	        	Integer bytesRead = 0;
-	        	
-	        	// loop to gather all bytes and output them to the file
-	        	do {
-	        		bytesRead = (Integer)ois.readObject();
-	        		buffer = (byte[])ois.readObject();
-	        		fos.write(buffer, 0, bytesRead);
-	        	} while (bytesRead == distConfig.getBufferSize());
-	        	
-	        	// Update the lpl
-	        	lpl.set_file(tmpFilesToReceive.get(index));
-	        	
-	        	// Send acknowledgment that the file was received
-	        	outStream.println(ConnectionCodes.RECEIVEDFILE);
-	        	outStream.flush();
-	        }
-	        			        
-	        // Close all streams
-	        oos.close();
-	        outStream.close();
-	        bos.close();
-	        ois.close();
-	        inStream.close();
-		}
-		
-		catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
-        }
+				this.distConfig = DistConfig.get_Instance();
+				this.nst = NodeSearchTable.get_Instance();
+				this.lpl = LocalPathList.get_Instance();
+				
+				try {
+					// Get the input stream for the server
+			        BufferedReader inStream = new BufferedReader (
+			                new InputStreamReader(client.getInputStream()));
+			        // Get the output stream for the server
+			        BufferedOutputStream bos = new BufferedOutputStream (
+			                client.getOutputStream());
+			        // Setup the writer to the server
+			        PrintWriter outStream = new PrintWriter(bos, false);
+			        
+			        // Setup the object input stream
+			        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
+			        // Setup the object writer to the server
+			        ObjectOutputStream oos = new ObjectOutputStream (bos);
+			        
+			        // Receive acknowledgment and send ID
+			        inStream.readLine();
+			        outStream.println(nst.get_ownID());
+			        outStream.flush();
+			        
+			        // Receive the list of files on the server
+			        Vector<FileObject> filesToReceive = (Vector<FileObject>)ois.readObject();
+			        
+			        // Get the list of files that need updating
+			        Vector<FileObject> tmpFilesToReceive = new Vector<FileObject>();
+			        FileObject tmpFO = null;
+			        for (int index = 0; index < filesToReceive.size(); index++) {
+			        	tmpFO = lpl.get_file(filesToReceive.get(index).getName());
+			        	// If the file currently doesn't exist on this node
+			        	if (tmpFO == null) {
+			        		tmpFilesToReceive.add(filesToReceive.get(index));
+			        	}
+			        	// Or if it is out of date
+			        	else if (tmpFO.getLastupdate().before(filesToReceive.get(index).getLastupdate())) {
+			        		tmpFilesToReceive.add(filesToReceive.get(index));
+			        	}
+			        }
+			        
+			        // Send the needed files
+			        oos.writeObject(tmpFilesToReceive);
+			        oos.flush();
+			        
+			        // loop through the files to receive
+			        for (int index = 0; index < tmpFilesToReceive.size(); index++) {
+			        	// Get the file name
+			        	String filename = inStream.readLine();
+			        	
+			        	// Open the file to write to it
+			        	File toReceive = new File (distConfig.get_rootPath() + filename);
+			        	FileOutputStream fos = new FileOutputStream(toReceive);
+			        	byte[] buffer = new byte[distConfig.getBufferSize()];
+			        	
+			        	Integer bytesRead = 0;
+			        	
+			        	// loop to gather all bytes and output them to the file
+			        	do {
+			        		bytesRead = (Integer)ois.readObject();
+			        		buffer = (byte[])ois.readObject();
+			        		fos.write(buffer, 0, bytesRead);
+			        	} while (bytesRead == distConfig.getBufferSize());
+			        	
+			        	// Update the lpl
+			        	lpl.set_file(tmpFilesToReceive.get(index));
+			        	
+			        	// Send acknowledgment that the file was received
+			        	outStream.println(ConnectionCodes.RECEIVEDFILE);
+			        	outStream.flush();
+			        }
+			        			        
+			        // Close all streams
+			        oos.close();
+			        outStream.close();
+			        bos.close();
+			        ois.close();
+			        inStream.close();
+			        client.close();
+				}
+				
+				catch (IOException | ClassNotFoundException ex) {
+		            Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+		        }
 	}
 }
 
