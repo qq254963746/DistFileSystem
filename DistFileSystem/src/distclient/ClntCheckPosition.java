@@ -94,14 +94,14 @@ public class ClntCheckPosition implements Runnable {
 	        } else {
 	        	
 	            int nextTestId = Integer.parseInt(in.readLine());
-	            client.setNextTestId(nextTestId);
-	            
 	            String nextTestIp = in.readLine();
-	            client.setNextTestIp(nextTestIp);
 	            
 	            System.out.println("Wrong Position");
 	            System.out.println("next ID = " + nextTestId);
+	            client.setId(nextTestId);
+	            
 	            System.out.println("next IP = " + nextTestIp);
+	            client.addTask(new ClntCheckPosition(nextTestIp, client));
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();

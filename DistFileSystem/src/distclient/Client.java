@@ -22,8 +22,6 @@ public abstract class Client {
     private String servIp;
     private String[] predecessor;
     private String[] successor;
-    private String nextTestIp;
-    private int nextTestId;
 	
 	public BufferedReader getIn() {
 		return in;
@@ -84,18 +82,6 @@ public abstract class Client {
 	}
 	public void setSuccessor(String[] successor) {
 		this.successor = successor;
-	}
-	public String getNextTestIp() {
-		return nextTestIp;
-	}
-	public void setNextTestIp(String nextTestIp) {
-		this.nextTestIp = nextTestIp;
-	}
-	public int getNextTestId() {
-		return nextTestId;
-	}
-	public void setNextTestId(int nextTestId) {
-		this.nextTestId = nextTestId;
 	}
 	public void addTask(Runnable task) {
 		tm.addTask(task);
