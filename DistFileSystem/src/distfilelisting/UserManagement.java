@@ -33,6 +33,12 @@ public class UserManagement {
 		return instance;
 	}
 	
+	public static UserManagement set_Instance(UserManagement userManage) {
+		instance = userManage;
+		return instance;
+		
+	}
+	
 	public String get_ownUserName () {
 		return this.ownUsername;
 	}

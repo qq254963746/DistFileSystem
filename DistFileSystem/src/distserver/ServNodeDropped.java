@@ -76,6 +76,8 @@ public class ServNodeDropped implements Runnable {
 	        // Setup the writer to the client
 	        PrintWriter outStream = new PrintWriter(bos, false);
 	        
+	        // Decrement the current nodes
+	        distConfig.decrement_CurrNodes();
 	        // Send Confirmation
 	        outStream.println(ConnectionCodes.NODEDROPPED);
 	        outStream.flush();

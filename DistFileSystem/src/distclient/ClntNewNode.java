@@ -15,6 +15,7 @@ import distconfig.Constants;
 import distconfig.DistConfig;
 import distfilelisting.FileObject;
 import distfilelisting.LocalPathList;
+import distfilelisting.UserManagement;
 
 public class ClntNewNode implements Runnable {
 	private String host;
@@ -71,6 +72,9 @@ public class ClntNewNode implements Runnable {
 	        System.out.println("Sending my IP as " + ip);
 	        outStream.println(ip);
 	        outStream.flush();
+	        
+	        System.out.println("Sending my username as" + UserManagement.get_Instance().get_ownUserName());
+	        outStream.println(UserManagement.get_Instance().get_ownUserName());
 	        
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());

@@ -6,6 +6,7 @@ package distserver;
 
 import distconfig.Sha1Generator;
 import distconfig.DistConfig;
+import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 import distnodelisting.GlobalNodeTable;
 
@@ -63,9 +64,10 @@ public class ServEnterNetwork implements Runnable {
             // Setup the writer for the object stream
             ObjectOutputStream oos = new ObjectOutputStream (bos);
             
-            // Send the configuration to the new client
+            // Send the configuration and user management object to the new client
             // This will make sure all nodes have the same config
             oos.writeObject(distConf);
+            oos.writeObject(UserManagement.get_Instance());
             oos.flush();
             
             // Wait to receive an acknowledgment before sending the next item

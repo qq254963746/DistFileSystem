@@ -31,6 +31,7 @@ public class ConnectionCodes {
 	public static final int HEARTBEAT = 18;
 	public static final int PREDDROPPED = 19;
 	public static final int NODEDROPPED = 20;
+	public static final int FORCEHEARTBEAT = 21;
 
 	// Error Codes
 	public static final int UNRECOGNIZEDCODE = 900;

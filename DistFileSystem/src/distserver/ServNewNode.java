@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
+import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 
 /**
@@ -57,6 +58,9 @@ public class ServNewNode implements Runnable {
 	        int newID = Integer.parseInt(inStream.readLine());
 	        String newIP = inStream.readLine();
 	        
+	        // Receive new user name
+	        String username = inStream.readLine();
+	        
 	        // Send received confirmation
 	        outStream.println(ConnectionCodes.NEWNODE);
 	        outStream.flush();
@@ -66,6 +70,13 @@ public class ServNewNode implements Runnable {
 	        outStream.close();
 	        inStream.close();
 	        client.close();
+	        
+	        // Increment the amount of nodes now on the network
+        	DistConfig.get_Instance().increment_CurrNodes();
+	        
+        	// Update the user management
+	        UserManagement useManage = UserManagement.get_Instance();
+	        useManage.add_User(username, "1");
 	        
 	        int myID = Integer.parseInt(nst.get_ownID());
 	        // If the newID is not the same as this servers ID

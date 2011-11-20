@@ -10,6 +10,7 @@ import java.net.Socket;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
+import distfilelisting.UserManagement;
 
 public class ClntEnterNetwork implements Runnable {
 	String host;
@@ -64,10 +65,10 @@ public class ClntEnterNetwork implements Runnable {
             System.out.println("Got Object InputStream");
             
             DistConfig sdc = (DistConfig) ois.readObject();
-            DistConfig mdc = DistConfig.get_Instance();
-            mdc.increment_CurrNodes();
+            DistConfig.set_Instance(sdc);
             System.out.println(sdc.get_CurrNodes());
-            System.out.println(mdc.get_CurrNodes());
+            UserManagement remoteManage = (UserManagement) ois.readObject();
+            UserManagement.set_Instance(remoteManage);
             
             outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
