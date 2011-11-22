@@ -6,6 +6,7 @@ package distfilelisting;
 import java.io.File;
 import java.util.Vector;
 
+import distconfig.Constants;
 import distconfig.DistConfig;
 import distnodelisting.NodeSearchTable;
 
@@ -40,7 +41,7 @@ public class LocalPathList extends Vector<FileObject> {
 		File newFile = new File (distConfig.get_rootPath() + filename);
 		
 		if (newFile.exists()) {
-			retval[0] = "1";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = filename + " already exists";
 			return retval;
 		}
@@ -49,6 +50,9 @@ public class LocalPathList extends Vector<FileObject> {
 		FileObject fo = new FileObject(filename, false, perms[0],
 				perms[1], perms[2], userName, groupName);
 		this.add(fo);
+		
+		retval[0] = Integer.toString(Constants.SUCCESS);
+		retval[1] = "File " + filename + ", successfully created";
 		
 		return retval;
 	}

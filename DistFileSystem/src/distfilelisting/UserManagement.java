@@ -6,6 +6,8 @@ package distfilelisting;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import distconfig.Constants;
+
 /**
  * @author paul
  *
@@ -70,13 +72,17 @@ public class UserManagement {
 		String[] retval = {null, null};
 		
 		if (this.globalUsers.containsKey(userName)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "The user " + userName +
 					", already exists";
 		}
 		else {
 			this.globalUsers.put(userName, passHash);
 			this.create_Group(userName, userName, passHash);
+			
+			retval[0] = Integer.toString(Constants.SUCCESS);
+			retval[1] = "The user " + userName +
+					", was successfully added";
 		}
 		
 		return retval;
@@ -86,15 +92,15 @@ public class UserManagement {
 
     	String[] retval = {null, null};
     	if (!this.globalUsers.containsKey(authUserName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "User, " + authUserName + ", does not exist";
     	}
     	else if (!((String)this.globalUsers.get(authUserName)).equals(passHash)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Incorrect authentication";
     	}
     	else if (this.globalGroupList.contains(groupName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Group, " + groupName + ", already exists";
     	}
     	else {
@@ -104,7 +110,7 @@ public class UserManagement {
     		currGroups.add(groupName);
     		this.globalUserGroups.put(authUserName, currGroups);
     		
-    		retval[0] = "1";
+    		retval[0] = Integer.toString(Constants.SUCCESS);
     		retval[1] = "Successfully created " + groupName;
     	}
     	
@@ -116,23 +122,23 @@ public class UserManagement {
 
     	String[] retval = {null, null};
     	if (!this.globalUsers.containsKey(authUserName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "User, " + authUserName + ", does not exist";
     	}
     	else if (!this.globalUsers.containsKey(userToRemove)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "User, " + userToRemove + ", does not exist";
     	}
     	else if (!((String)this.globalUsers.get(authUserName)).equals(passHash)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Incorrect authentication";
     	}
     	else if (!this.globalGroupList.contains(groupName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Group, " + groupName + ", does not exist";
     	}
     	else if (!this.globalUserGroups.get(authUserName).contains(groupName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Requesting user not in group " + groupName;
     	}
     	else {
@@ -140,7 +146,7 @@ public class UserManagement {
     		currGroups.add(groupName);
     		this.globalUserGroups.put(userToRemove, currGroups);
     		
-    		retval[0] = "1";
+    		retval[0] = Integer.toString(Constants.SUCCESS);
     		retval[1] = "Successfully added " + userToRemove +
     				", to group " + groupName + ".";
     	}
@@ -153,23 +159,23 @@ public class UserManagement {
 		
     	String[] retval = {null, null};
     	if (!this.globalUsers.containsKey(authUserName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "User, " + authUserName + ", does not exist";
     	}
     	else if (!this.globalUsers.containsKey(userToAdd)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "User, " + userToAdd + ", does not exist";
     	}
     	else if (!((String)this.globalUsers.get(authUserName)).equals(passHash)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Incorrect authentication";
     	}
     	else if (!this.globalGroupList.contains(groupName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Group, " + groupName + ", does not exist";
     	}
     	else if (!this.globalUserGroups.get(authUserName).contains(groupName)) {
-    		retval[0] = "0";
+    		retval[0] = Integer.toString(Constants.FAILURE);
     		retval[1] = "Requesting user not in group " + groupName;
     	}
     	else {
@@ -177,7 +183,7 @@ public class UserManagement {
     		currGroups.add(groupName);
     		this.globalUserGroups.put(userToAdd, currGroups);
     		
-    		retval[0] = "1";
+    		retval[0] = Integer.toString(Constants.SUCCESS);
     		retval[1] = "Successfully added " + userToAdd +
     				", to group " + groupName + ".";
     	}

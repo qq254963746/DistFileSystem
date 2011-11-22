@@ -32,6 +32,10 @@ public class ConnectionCodes {
 	public static final int PREDDROPPED = 19;
 	public static final int NODEDROPPED = 20;
 	public static final int FORCEHEARTBEAT = 21;
+	public static final int USERMANAGEMENT = 22;
+	public static final int NEWGROUP = 23;
+	public static final int ADDUSERTOGROUP = 24;
+	public static final int REMOVEUSERFROMGROUP = 25;
 
 	// Error Codes
 	public static final int UNRECOGNIZEDCODE = 900;

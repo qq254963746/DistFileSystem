@@ -5,6 +5,7 @@ package distfilelisting;
 
 import java.util.Date;
 
+import distconfig.Constants;
 import distconfig.Sha1Generator;
 
 
@@ -47,16 +48,16 @@ public class FileObject {
 		String[] retval = {null, null};
 		
 		if (!this.owner.equals(reqUser)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "Requesting user, " + reqUser + ", is not owner";
 		}
 		else if (!um.auth_User(reqUser, hashAuth)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "Bad password for user " + reqUser;
 		}
 		else {
 			this.owner = newOwner;
-			retval[0] = "1";
+			retval[0] = Integer.toString(Constants.SUCCESS);
 			retval[1] = "Owner of " + this.name +
 					", changed to " + newOwner;
 			this.lastupdate = new Date();
@@ -75,17 +76,17 @@ public class FileObject {
 		UserManagement um = UserManagement.get_Instance();
 		
 		if(!um.auth_User(reqUser, authHash)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "Bad password for user " + reqUser;
 		}
 		else if (!reqUser.equals(this.owner)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "User " + reqUser +
 					", is not the owner of " + this.name;
 			this.group = newGroup;
 		}
 		else {
-			retval[0] = "1";
+			retval[0] = Integer.toString(Constants.SUCCESS);
 			retval[1] = "Group has been changed to " + newGroup;
 			this.group = newGroup;
 			this.lastupdate = new Date();
@@ -134,7 +135,7 @@ public class FileObject {
 		UserManagement um = UserManagement.get_Instance();
 		
 		if (!um.auth_User(reqUser, authHash)) {
-			retval[0] = "0";
+			retval[0] = Integer.toString(Constants.FAILURE);
 			retval[1] = "User " + reqUser +
 					" is not the owner of " + this.name;
 		}
@@ -143,7 +144,7 @@ public class FileObject {
 			this.groupPermission = groupPerm;
 			this.globalPermission = globalPerm;
 			
-			retval[0] = "1";
+			retval[0] = Integer.toString(Constants.SUCCESS);
 			retval[1] = "Permissions of " + this.name +
 					"Successfully set to " +
 					Integer.toString(this.ownerPermission) +
