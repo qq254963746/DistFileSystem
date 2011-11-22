@@ -48,6 +48,30 @@ public class Server implements Runnable {
         }
     }
     
+    public void stop_Server() {
+    	try {
+			this.sock.close();
+			this.running = false;
+			
+			while (this.backgrounded.size() > 0) {
+				for (int i = 0; i < this.backgrounded.size(); i++) {
+                    if (this.backgrounded.elementAt(i) == null) {
+                        continue;
+                    }
+                    Thread tmpThread = (Thread)this.backgrounded.elementAt(i);
+                    if ( !tmpThread.isAlive() ) {
+                        tmpThread.join();
+                        this.backgrounded.remove(i);
+                        i -= 1;
+                    }
+                }
+			}
+			
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+    }
+    
     @Override
     public void run() {
         Socket client = null;
