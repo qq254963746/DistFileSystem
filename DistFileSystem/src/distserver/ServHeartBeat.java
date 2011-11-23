@@ -145,7 +145,10 @@ public class ServHeartBeat implements Runnable {
 	        inStream.close();
 		}
 		
-		catch (IOException | ClassNotFoundException ex) {
+		catch (ClassNotFoundException ex) {
+			Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		catch (IOException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
@@ -239,7 +242,10 @@ public class ServHeartBeat implements Runnable {
 	        inStream.close();
 		}
 		
-		catch (IOException | ClassNotFoundException ex) {
+		catch (ClassNotFoundException ex) {
+			Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		catch (IOException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}

@@ -220,7 +220,10 @@ public class ServUploadFile implements Runnable {
 		}
 		
 		// Catch any potential errors
-		catch (IOException | ClassNotFoundException ex) {
+		catch (IOException ex) {
+			Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		catch (ClassNotFoundException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}

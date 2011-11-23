@@ -67,8 +67,12 @@ public class Server implements Runnable {
                 }
 			}
 			
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+		} 
+    	catch (InterruptedException ex) {
+    		ex.printStackTrace();
+    	}
+    	catch (IOException ex) {
+			ex.printStackTrace();
 		}
     }
     
