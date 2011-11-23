@@ -133,19 +133,17 @@ public class DistFileSystemMain {
 				System.out.printf(this.prompt, this.userManage.get_ownUserName());
 				input = inStream.readLine();
 				
-				switch (input) {
-				case "view predecessor":
+				if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
 					System.out.printf("Predecessor IP = %s\n", this.nst.get_predecessorIPAddress());
-					break;
-					
-				case "view node search table":
+				}
+				else if (input.equals("view node search table")) {
 					for(int index = 0; index < this.nst.size(); index++) {
 						System.out.printf("Entry: %d\tID: %s\tIP: %s\n",
 								index, this.nst.get_IDAt(index), this.nst.get_IPAt(index));
 					}
-					break;
 				}
+				
 			}
 			
 			catch (IOException e) {
