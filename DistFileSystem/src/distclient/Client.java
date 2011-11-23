@@ -7,7 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public abstract class Client {
+public class Client {
 	
 	private final TaskManager tm = new TaskManager();
 	
@@ -22,6 +22,10 @@ public abstract class Client {
     private String servIp;
     private String[] predecessor;
     private String[] successor;
+    
+    public Client() {
+    	
+    }
 	
 	public BufferedReader getIn() {
 		return in;

@@ -60,7 +60,7 @@ public class ClntNewPredecessor implements Runnable {
 	
 	        
 	        System.out.println("Sending Code");
-	        outStream.println(ConnectionCodes.NEWPREDECESSOR);
+	        outStream.println(ConnectionCodes.NEWSUCCESSOR);
 	        outStream.flush();
 	        
 	        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
@@ -77,7 +77,7 @@ public class ClntNewPredecessor implements Runnable {
 	        Vector<FileObject> vfo = (Vector<FileObject>) ois.readObject();
 	        
 	        System.out.println("Sending confirm");
-	        outStream.println(ConnectionCodes.NEWPREDECESSOR);
+	        outStream.println(ConnectionCodes.NEWSUCCESSOR);
 	        outStream.flush();        
 	        
 	        for (FileObject f : vfo) {
@@ -100,7 +100,7 @@ public class ClntNewPredecessor implements Runnable {
 		        LocalPathList.get_Instance().add(f);
 	            
 	            System.out.println("Sending file receipt");
-		        outStream.println(ConnectionCodes.NEWPREDECESSOR);
+		        outStream.println(ConnectionCodes.NEWSUCCESSOR);
 		        outStream.flush();
 	        }
 	        

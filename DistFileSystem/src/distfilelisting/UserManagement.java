@@ -41,6 +41,13 @@ public class UserManagement {
 		
 	}
 	
+	public void set_ownUserName (String ownUserName) {
+		this.ownUsername = ownUserName;
+		if (!this.globalUsers.containsKey(ownUserName))
+			this.globalUsers.put(ownUserName, "1");
+		this.create_Group(ownUserName, ownUserName, "1");
+	}
+	
 	public String get_ownUserName () {
 		return this.ownUsername;
 	}

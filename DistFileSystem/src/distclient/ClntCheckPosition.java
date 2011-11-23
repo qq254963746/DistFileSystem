@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import distconfig.ConnectionCodes;
 import distconfig.Constants;
 import distconfig.DistConfig;
+import distnodelisting.NodeSearchTable;
 
 public class ClntCheckPosition implements Runnable {
 	private String host;
@@ -76,6 +78,8 @@ public class ClntCheckPosition implements Runnable {
 	        
 	        if (Integer.parseInt(tmpline) == ConnectionCodes.NEWID) {
 	            id = Integer.parseInt(in.readLine());
+	            NodeSearchTable.get_Instance().set_own(Integer.toString(id),
+	            		InetAddress.getLocalHost().toString());
 	            client.setId(id);
 	            System.out.println("New ID = " + id);
 	            tmpline = in.readLine();
