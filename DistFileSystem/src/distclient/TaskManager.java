@@ -16,7 +16,7 @@ public class TaskManager extends Thread {
 
 	@Override
 	public void run() {
-		//this.setDaemon(true);
+		this.setDaemon(true);
 		
 		try {
 			while (true) {

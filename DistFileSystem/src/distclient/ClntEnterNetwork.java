@@ -34,18 +34,15 @@ public class ClntEnterNetwork implements Runnable {
 			
 			Socket sock = new Socket(host,port);
 	        sock.setSoTimeout(5000);
-	        client.setSock(sock);
 	        
 	        System.out.println("Connected");
 	        
 	        BufferedOutputStream bos = new BufferedOutputStream (
                     sock.getOutputStream());
-            client.setBos(bos);
             
             System.out.println("Got OutputStream");
             
             PrintWriter outStream = new PrintWriter(bos, false);
-            client.setOutStream(outStream); 
            
             System.out.println("Got PrintWriter");
 
@@ -53,7 +50,6 @@ public class ClntEnterNetwork implements Runnable {
                     new InputStreamReader (
                             sock.getInputStream()));
             
-            client.setIn(in);
             System.out.println("Got InputStream");
             
             System.out.println("Sending Code");
@@ -61,7 +57,6 @@ public class ClntEnterNetwork implements Runnable {
             outStream.flush();
             
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-            client.setOis(ois);
             System.out.println("Got Object InputStream");
             
             DistConfig sdc = (DistConfig) ois.readObject();

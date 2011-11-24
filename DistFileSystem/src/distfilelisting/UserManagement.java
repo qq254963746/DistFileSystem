@@ -25,6 +25,9 @@ public class UserManagement {
 		ownUsername = System.getProperty("user.name");
 		this.globalUsers = new Hashtable<String, String>();
 		this.globalUsers.put(ownUsername, "5");
+		this.globalGroupList = new Vector<String>();
+		this.globalUserGroups = new Hashtable<String, Vector<String>>();
+		
 	}
 	
 	public static UserManagement get_Instance () {
