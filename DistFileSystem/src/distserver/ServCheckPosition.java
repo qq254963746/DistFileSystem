@@ -81,8 +81,10 @@ public class ServCheckPosition implements Runnable {
                 newID = (newID + 1) % distConfig.get_MaxNodes();
                 outStream.println(ConnectionCodes.NEWID);
                 outStream.flush();
+                System.out.println("Sending ID as " + Integer.toString(newID));
                 outStream.println(Integer.toString(newID));
                 outStream.flush();
+                System.out.println("Finished with new node ID");
                 // Now continue with the check
             }
             
