@@ -49,16 +49,20 @@ public class ServCheckPosition implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
+            System.out.println("Got the input stream");
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.println("Got the out stream");
             // Setup the object writer to the client
             ObjectOutputStream oos = new ObjectOutputStream (bos);
+            System.out.println("Got the object output stream");
             
             // Send an acknowledgment that the server is connected
             // for checking the position
+            System.out.println("Sending the connection code");
             outStream.println(ConnectionCodes.CHECKPOSITION);
             outStream.flush();
             
