@@ -70,6 +70,7 @@ public class ServCheckPosition implements Runnable {
             System.out.println("Waiting for node ID");
             String newNodeID = (String)inStream.readLine();
             int newID = Integer.parseInt(newNodeID);
+            System.out.printf("Recieved ID as %d\n", newID);
             
             NodeSearchTable dct = NodeSearchTable.get_Instance();
             
@@ -95,7 +96,7 @@ public class ServCheckPosition implements Runnable {
             if ((id < newID && newID < nextID) || 
                     (nextID < id && id < newID) ||
                     (newID < nextID && nextID < id) ||
-                    Integer.parseInt(dct.get_predecessorID()) == id) { 
+                    (nextID == id)) { 
                 // Send CORRECTPOSITION message
                 outStream.println(ConnectionCodes.CORRECTPOSITION);
                 outStream.flush();
@@ -112,6 +113,7 @@ public class ServCheckPosition implements Runnable {
             }
             // Else, discover what two nodes it is between
             else {
+            	System.out.println("Not Correct Position");
                 // Check to see which two ID's in the connection table
                 // the new client ID is between
                 
