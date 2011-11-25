@@ -4,6 +4,7 @@
 package distfilelisting;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Vector;
 
 import distconfig.Constants;
@@ -12,7 +13,7 @@ import distnodelisting.NodeSearchTable;
 
 
 
-public class LocalPathList extends Vector<FileObject> {
+public class LocalPathList extends Vector<FileObject> implements Serializable {
 	
 	/**
 	 * 

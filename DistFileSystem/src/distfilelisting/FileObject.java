@@ -3,14 +3,19 @@
 
 package distfilelisting;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import distconfig.Constants;
 import distconfig.Sha1Generator;
 
 
-public class FileObject {
+public class FileObject implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String owner;
 	private String group;

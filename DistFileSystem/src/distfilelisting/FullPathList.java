@@ -3,11 +3,12 @@
 
 package distfilelisting;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 
 
-public class FullPathList extends Vector<Object> {
+public class FullPathList extends Vector<Object> implements Serializable {
 	
 	/**
 	 * 

@@ -3,6 +3,7 @@
 
 package distfilelisting;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -12,8 +13,13 @@ import distconfig.Constants;
  * @author paul
  *
  */
-public class UserManagement {
+public class UserManagement implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static UserManagement instance = null;
 	
 	private String ownUsername = null;
