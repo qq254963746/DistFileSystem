@@ -245,6 +245,7 @@ public class Server implements Runnable {
                 try {
                     // The line was not an integer, return error code
                     // Get the output stream for the client
+                	System.out.println("Unknown number exception");
                     BufferedOutputStream bos = new BufferedOutputStream (
                             client.getOutputStream());
                     PrintWriter outputStream = new PrintWriter(bos, false);
