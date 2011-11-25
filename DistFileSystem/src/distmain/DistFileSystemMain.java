@@ -68,15 +68,15 @@ public class DistFileSystemMain {
 			
 			Client cli = new Client();
 			
-			cli.addTask(new ClntEnterNetwork(ipAddress, cli));
-			
 			// Connect to the network and get initial search location
 			System.out.printf("Connecting to %s\n", ipAddress);
+			cli.addTask(new ClntEnterNetwork(ipAddress, cli));
 		
 			nextID = cli.getServId();
 			nextIP = cli.getServIp();
 			
 			// Locate the servers location
+			System.out.printf("Entering netwrok at %s\n", nextIP);
 			cli.addTask(new ClntCheckPosition(nextIP, nextID, cli));
 			
 			String[] pred = cli.getPredecessor();
