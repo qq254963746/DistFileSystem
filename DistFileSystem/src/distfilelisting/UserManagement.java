@@ -27,6 +27,7 @@ public class UserManagement {
 		//this.globalUsers.put(ownUsername, "5");
 		this.globalGroupList = new Vector<String>();
 		this.globalUserGroups = new Hashtable<String, Vector<String>>();
+		
 	}
 	
 	public static UserManagement get_Instance () {
@@ -119,6 +120,7 @@ public class UserManagement {
     		if (currGroups == null) {
     			currGroups = new Vector<String>();
     		}
+    		
     		currGroups.add(groupName);
     		this.globalUserGroups.put(authUserName, currGroups);
     		

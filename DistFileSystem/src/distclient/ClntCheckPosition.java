@@ -38,23 +38,19 @@ public class ClntCheckPosition implements Runnable {
 	    	
 			System.out.println("Connecting");
 			Socket sock = new Socket(host, distConfig.get_servPortNumber());
-	        client.setSock(sock);
 	
 	        sock.setSoTimeout(5000);
 	        System.out.println("Connected");
 	        
 	        BufferedOutputStream bos = new BufferedOutputStream (
 	                                sock.getOutputStream());
-	        client.setBos(bos);
 	        System.out.println("Got OutputStream");
 	        PrintWriter outStream = new PrintWriter(bos, false);
-	        client.setOutStream(outStream);
 	        System.out.println("Got PrintWriter");
 	
 	        BufferedReader in = new BufferedReader (
 	                    new InputStreamReader (
 	                            sock.getInputStream()));
-	        client.setIn(in);
 	        System.out.println("Got InputStream");
 	        
 	
@@ -64,7 +60,6 @@ public class ClntCheckPosition implements Runnable {
 	        outStream.flush();
 	        
 	        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-	        client.setOis(ois);
 	        System.out.println("Got Object InputStream");
 	        
 	        System.out.println("Getting Ack");

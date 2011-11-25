@@ -19,7 +19,6 @@ import distfilelisting.LocalPathList;
 public class ClntNewSuccessor implements Runnable {
 	private String host;
 	private Client client;
-	private int id;
 	
 	public ClntNewSuccessor(Client client){
 		this(client.getPredecessor()[Constants.IP_ADDRESS], client);
@@ -38,23 +37,19 @@ public class ClntNewSuccessor implements Runnable {
 	    	
 			System.out.println("Connecting");
 			Socket sock = new Socket(host, distConfig.get_servPortNumber());
-	        client.setSock(sock);
 	
 	        sock.setSoTimeout(5000);
 	        System.out.println("Connected");
 	        
 	        BufferedOutputStream bos = new BufferedOutputStream (
 	                                sock.getOutputStream());
-	        client.setBos(bos);
 	        System.out.println("Got OutputStream");
 	        PrintWriter outStream = new PrintWriter(bos, false);
-	        client.setOutStream(outStream);
 	        System.out.println("Got PrintWriter");
 	
 	        BufferedReader in = new BufferedReader (
 	                    new InputStreamReader (
 	                            sock.getInputStream()));
-	        client.setIn(in);
 	        System.out.println("Got InputStream");
 	        
 	
@@ -64,17 +59,18 @@ public class ClntNewSuccessor implements Runnable {
 	        outStream.flush();
 	        
 	        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-	        client.setOis(ois);
 	        System.out.println("Got Object InputStream");
 	        
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
+	        
 	        System.out.println("Sending my ID as " + client.getId());
-	        outStream.println(Integer.toString(id));
+	        outStream.println(Integer.toString(client.getId()));
 	        outStream.flush();
 	        
-	        Vector<FileObject> vfo = (Vector<FileObject>) ois.readObject();
+	        @SuppressWarnings("unchecked")
+			Vector<FileObject> vfo = (Vector<FileObject>) ois.readObject();
 	        
 	        System.out.println("Sending confirm");
 	        outStream.println(ConnectionCodes.NEWPREDECESSOR);
