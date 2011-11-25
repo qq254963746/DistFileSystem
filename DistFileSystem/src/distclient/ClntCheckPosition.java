@@ -74,7 +74,7 @@ public class ClntCheckPosition implements Runnable {
 	        if (Integer.parseInt(tmpline) == ConnectionCodes.NEWID) {
 	            id = Integer.parseInt(in.readLine());
 	            NodeSearchTable.get_Instance().set_own(Integer.toString(id),
-	            		InetAddress.getLocalHost().toString());
+	            		NodeSearchTable.get_Instance().get_ownIPAddress());
 	            client.setId(id);
 	            System.out.println("New ID = " + id);
 	            tmpline = in.readLine();
