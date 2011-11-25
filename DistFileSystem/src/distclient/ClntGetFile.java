@@ -136,9 +136,6 @@ public class ClntGetFile implements Runnable {
 		        }
 	        	
 	        } else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
-	        	int nextId = Integer.parseInt(in.readLine());
-		        System.out.println("Received next ID: " + nextId);
-		        
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
