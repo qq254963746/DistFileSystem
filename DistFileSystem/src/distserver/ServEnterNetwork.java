@@ -47,30 +47,37 @@ public class ServEnterNetwork implements Runnable {
     @Override
     public void run() {
         try {
+        	System.out.println("In thread for connect to network");
             distConf = DistConfig.get_Instance();
-            Logger.getLogger(
-                    ServEnterNetwork.class.getName()).log(
-                    Level.INFO, null, 
-                    "In thread to connect a new node to the netwrok");
+            //Logger.getLogger(
+            //        ServEnterNetwork.class.getName()).log(
+            //        Level.INFO, null, 
+            //        "In thread to connect a new node to the netwrok");
             
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
+            System.out.println("Got input stream");
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the output stream
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.println("Got out stream");
             // Setup the writer for the object stream
             ObjectOutputStream oos = new ObjectOutputStream (bos);
+            System.out.println("Got object output stream");
             
             // Send the configuration and user management object to the new client
             // This will make sure all nodes have the same config
+            System.out.println("Sending the dist config");
             oos.writeObject(distConf);
+            System.out.println("Sending user management");
             oos.writeObject(UserManagement.get_Instance());
             oos.flush();
             
             // Wait to receive an acknowledgment before sending the next item
+            System.out.println("Receiving reply");
             inStream.readLine();
             
             // Get the client IP address and create the hash
@@ -79,6 +86,7 @@ public class ServEnterNetwork implements Runnable {
             InetAddress cliAddress = client.getInetAddress();
             int newClientID = 
                     Sha1Generator.generate_Sha1(cliAddress.getHostAddress());
+            System.out.println("Sha1 is " + Integer.toString(newClientID));
             
             if (distConf.get_UseGlobalNodeTable()) {
                 GlobalNodeTable dgt = GlobalNodeTable.get_instance();
