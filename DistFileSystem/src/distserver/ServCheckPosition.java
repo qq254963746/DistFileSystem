@@ -85,6 +85,7 @@ public class ServCheckPosition implements Runnable {
                 // Now continue with the check
             }
             
+            System.out.printf("Own ID: %d\tPred ID: %d", id, Integer.parseInt(dct.get_predecessorID()));
             // Check if the new node's ID is between the current ID and the next
             int nextID = Integer.parseInt(dct.get_IDAt(0));
             // If the new ID is between this ID and the next
