@@ -8,12 +8,9 @@ package distmain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
 import java.util.Vector;
 
 import distclient.*;
-import distconfig.DistConfig;
-import distfilelisting.LocalPathList;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 import distserver.Server;
@@ -23,7 +20,6 @@ public class DistFileSystemMain {
 	
 	private String prompt = "%s : ";
 	private BufferedReader inStream;
-	private DistConfig distConfig = null;
 	private UserManagement userManage = null;
 	private NodeSearchTable nst = null;
 	
@@ -34,7 +30,6 @@ public class DistFileSystemMain {
 	public DistFileSystemMain () {
 		try {
 			inStream = new BufferedReader(new InputStreamReader(System.in));
-			distConfig = DistConfig.get_Instance();
 			userManage = UserManagement.get_Instance();
 			nst = NodeSearchTable.get_Instance();
 			
@@ -60,6 +55,7 @@ public class DistFileSystemMain {
 	}
 	
 	public void start_server() {
+		System.out.println("Starting Server");
 		Server serv = new Server();
 		thServ = new Thread (serv);
 		thServ.start();

@@ -29,25 +29,25 @@ public class NodeSearchTable extends Vector<String[]> {
     private String[] own = new String[2];
     
     
-    private NodeSearchTable () {}
+    private NodeSearchTable () {
+    	int totalToSearch = (int)(Math.ceil(Math.sqrt(DistConfig.get_Instance().get_MaxNodes())));
+        this.setSize(totalToSearch);
+        try {
+			this.own[1] = InetAddress.getLocalHost().getHostAddress().toString();
+			this.own[0] = Integer.toString(Sha1Generator.generate_Sha1(this.own[1]));
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+        
+        for (int index = 0; index < this.size(); index++) {
+        	this.set(index, this.own);
+        }
+        this.set_predicessor(this.own[0], this.own[1]);
+    }
     
     public static NodeSearchTable get_Instance () {
         if (dctInstance == null) {
             dctInstance = new NodeSearchTable();
-            
-            int totalToSearch = (int)(Math.ceil(Math.sqrt(DistConfig.get_Instance().get_MaxNodes())));
-            dctInstance.setSize(totalToSearch);
-            try {
-    			dctInstance.own[1] = InetAddress.getLocalHost().getHostAddress().toString();
-    			dctInstance.own[0] = Integer.toString(Sha1Generator.generate_Sha1(dctInstance.own[1]));
-    		} catch (UnknownHostException e) {
-    			e.printStackTrace();
-    		}
-            
-            for (int index = 0; index < dctInstance.size(); index++) {
-            	dctInstance.set(index, dctInstance.own);
-            }
-            dctInstance.set_predicessor(dctInstance.own[0], dctInstance.own[1]);
         }
         
         return dctInstance;
