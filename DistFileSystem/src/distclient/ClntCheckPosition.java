@@ -78,6 +78,7 @@ public class ClntCheckPosition implements Runnable {
 	            client.setId(id);
 	            System.out.println("New ID = " + id);
 	            tmpline = in.readLine();
+	            System.out.printf("Received Code %s\n", tmpline);
 	        }
 	        
 	        if ( Integer.parseInt(tmpline) == ConnectionCodes.CORRECTPOSITION) {
