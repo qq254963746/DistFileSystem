@@ -72,6 +72,7 @@ public class ServEnterNetwork implements Runnable {
             // This will make sure all nodes have the same config
             System.out.println("Sending the dist config");
             oos.writeObject(distConf);
+            oos.flush();
             System.out.println("Sending user management");
             oos.writeObject(UserManagement.get_Instance());
             oos.flush();
