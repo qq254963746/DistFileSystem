@@ -69,30 +69,41 @@ public class DistFileSystemMain {
 			Client cli = new Client();
 			
 			// Connect to the network and get initial search location
+			// These have to all run in the same thread since they rely on each other
 			System.out.printf("Connecting to %s\n", ipAddress);
-			cli.addTask(new ClntEnterNetwork(ipAddress, cli));
+			ClntEnterNetwork cen = new ClntEnterNetwork(ipAddress, cli);
+			cen.run();
+			cen = null;
 		
 			nextID = cli.getServId();
 			nextIP = cli.getServIp();
 			
 			// Locate the servers location
-			System.out.printf("Entering netwrok at %s\n", nextIP);
-			cli.addTask(new ClntCheckPosition(nextIP, nextID, cli));
+			System.out.printf("Entering network at %s\n", nextIP);
+			ClntCheckPosition ccp = new ClntCheckPosition(nextIP, nextID, cli);
+			ccp.run();
+			ccp = null;
 			
 			String[] pred = cli.getPredecessor();
 			String[] succ = cli.getSuccessor();
 			
 			// Connect to the predecessor
 			System.out.printf("Connecting to predecessor %s\n", pred[1]);
-			cli.addTask(new ClntNewPredecessor(cli));
+			ClntNewPredecessor cnp = new ClntNewPredecessor(cli);
+			cnp.run();
+			cnp = null;
 			
 			// Connect to the successor
 			System.out.printf("Connecting to successor %s\n", succ[1]);
-			cli.addTask(new ClntNewSuccessor(cli));
+			ClntNewSuccessor cns = new ClntNewSuccessor(cli);
+			cns.run();
+			cns = null;
 			
 			// Send new node notification
 			System.out.printf("Sending the new node notification\n");
-			cli.addTask(new ClntNewNode(succ[1]));
+			ClntNewNode cnn = new ClntNewNode(succ[1]);
+			cnn.run();
+			cnn = null;
 			
 			System.out.println ("Connected to the network\n");
 			
