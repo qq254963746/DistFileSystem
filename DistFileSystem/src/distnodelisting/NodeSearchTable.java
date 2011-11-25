@@ -4,8 +4,11 @@
  */
 package distnodelisting;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import distconfig.DistConfig;
@@ -33,9 +36,33 @@ public class NodeSearchTable extends Vector<String[]> {
     	int totalToSearch = (int)(Math.ceil(Math.sqrt(DistConfig.get_Instance().get_MaxNodes())));
         this.setSize(totalToSearch);
         try {
-			this.own[1] = InetAddress.getLocalHost().getHostAddress().toString();
+        	Enumeration<NetworkInterface> netInts = NetworkInterface.getNetworkInterfaces();
+        	Inet4Address lch = null;
+        	
+        	while (netInts.hasMoreElements()) {
+        		NetworkInterface ni = netInts.nextElement();
+        		Enumeration<InetAddress> ie = ni.getInetAddresses();
+        		
+    			while (ie.hasMoreElements()) {
+    				try {
+    					lch = (Inet4Address)ie.nextElement();
+    					break;
+    				}
+    				catch (Exception e) {}
+    			}
+        		if (!lch.isLoopbackAddress()) break;
+        		
+        		
+        	}
+        	
+			this.own[1] = lch.getHostAddress().toString();
 			this.own[0] = Integer.toString(Sha1Generator.generate_Sha1(this.own[1]));
-		} catch (UnknownHostException e) {
+		} 
+        //catch (UnknownHostException e) {
+		//	e.printStackTrace();
+		//} 
+        catch (SocketException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
