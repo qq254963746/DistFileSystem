@@ -54,13 +54,14 @@ public class ClntNewNode implements Runnable {
 	        System.out.println("Sending my ID as " + id);
 	        outStream.println(Integer.toString(id));
 	        
-	        String ip = sock.getInetAddress().getHostAddress();
+	        String ip = NodeSearchTable.get_Instance().get_ownIPAddress();
 	        System.out.println("Sending my IP as " + ip);
 	        outStream.println(ip);
 	        outStream.flush();
 	        
 	        System.out.println("Sending my username as" + UserManagement.get_Instance().get_ownUserName());
 	        outStream.println(UserManagement.get_Instance().get_ownUserName());
+	        outStream.flush();
 	        
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());

@@ -90,6 +90,7 @@ public class ServNewNode implements Runnable {
 		}
 		
 		catch (IOException ex) {
+			System.out.println("Inside run inside ServNewNode");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
@@ -156,6 +157,7 @@ public class ServNewNode implements Runnable {
 		}
 		
 		catch (IOException ex) {
+			System.out.println("Inside push inside ServNewNode");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
@@ -199,6 +201,7 @@ public class ServNewNode implements Runnable {
 		}
 		
 		catch (IOException ex) {
+			System.out.println("Inside send ServNewNode");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
