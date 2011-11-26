@@ -105,7 +105,6 @@ public class ClntCheckPosition implements Runnable {
 	            ClntCheckPosition ccp = new ClntCheckPosition (nextTestIp, client);
 	            ccp.run();
 	            ccp = null;
-	            //client.addTask(new ClntCheckPosition(nextTestIp, client));
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();

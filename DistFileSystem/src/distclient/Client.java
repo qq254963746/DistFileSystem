@@ -1,5 +1,7 @@
 package distclient;
 
+import distnodelisting.NodeSearchTable;
+
 
 public class Client {
 	
@@ -16,10 +18,10 @@ public class Client {
     }
 	
 	public int getId() {
-		return id;
+		return Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
 	}
 	public void setId(int id) {
-		this.id = id;
+		NodeSearchTable.get_Instance().set_OwnID(Integer.toString(id));
 	}
 	public int getServId() {
 		return servId;

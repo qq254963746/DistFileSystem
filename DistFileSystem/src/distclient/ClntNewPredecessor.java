@@ -15,6 +15,7 @@ import distconfig.Constants;
 import distconfig.DistConfig;
 import distfilelisting.FileObject;
 import distfilelisting.LocalPathList;
+import distnodelisting.NodeSearchTable;
 
 public class ClntNewPredecessor implements Runnable {
 	private String host;
@@ -64,8 +65,9 @@ public class ClntNewPredecessor implements Runnable {
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
-	        System.out.println("Sending my ID as " + client.getId());
-	        outStream.println(Integer.toString(client.getId()));
+	        int id = Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
+	        System.out.println("Sending my ID as " + id);
+	        outStream.println(Integer.toString(id));
 	        outStream.flush();
 	        
 	        @SuppressWarnings("unchecked")

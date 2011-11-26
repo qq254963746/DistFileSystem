@@ -10,6 +10,7 @@ import java.net.Socket;
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distfilelisting.UserManagement;
+import distnodelisting.NodeSearchTable;
 
 public class ClntNewNode implements Runnable {
 	private String host;
@@ -49,6 +50,7 @@ public class ClntNewNode implements Runnable {
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
+	        id = Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
 	        System.out.println("Sending my ID as " + id);
 	        outStream.println(Integer.toString(id));
 	        
@@ -64,6 +66,7 @@ public class ClntNewNode implements Runnable {
 	        System.out.println(in.readLine());
 	        
 		} catch (IOException e) {
+			System.out.println("Inside ClntNewNode");
 			e.printStackTrace();
 		}
 	}
