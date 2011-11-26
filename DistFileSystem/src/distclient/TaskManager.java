@@ -11,7 +11,7 @@ public class TaskManager extends Thread {
 	}
 	
 	public TaskManager() {
-		this.start();
+		//this.start();
 	}
 
 	@Override
