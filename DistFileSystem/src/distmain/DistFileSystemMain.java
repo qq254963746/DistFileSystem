@@ -88,13 +88,13 @@ public class DistFileSystemMain {
 			String[] pred = cli.getPredecessor();
 			String[] succ = cli.getSuccessor();
 			
-			/*// Connect to the predecessor
+			// Connect to the predecessor
 			System.out.printf("Connecting to predecessor %s\n", pred[1]);
 			ClntNewPredecessor cnp = new ClntNewPredecessor(cli);
 			cnp.run();
 			cnp = null;
 			
-			// Connect to the successor
+			/*// Connect to the successor
 			System.out.printf("Connecting to successor %s\n", succ[1]);
 			ClntNewSuccessor cns = new ClntNewSuccessor(cli);
 			cns.run();

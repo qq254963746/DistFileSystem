@@ -69,9 +69,7 @@ public class ServCheckPosition implements Runnable {
             // Receive the new node's ID
             System.out.println("Waiting for node ID");
             String newNodeID = inStream.readLine();
-            System.out.println("Recieved ID sas " + newNodeID);
             int newID = Integer.parseInt(newNodeID);
-            
             System.out.printf("Recieved ID as %d\n", newID);
             System.out.flush();
             
@@ -92,15 +90,14 @@ public class ServCheckPosition implements Runnable {
                 // Now continue with the check
             }
             
-            System.out.printf("Own ID: %d\tPred ID: %d\n", id, Integer.parseInt(dct.get_predecessorID()));
-            System.out.flush();
             // Check if the new node's ID is between the current ID and the next
             int nextID = Integer.parseInt(dct.get_IDAt(0));
             // If the new ID is between this ID and the next
             if ((id < newID && newID < nextID) || 
                     (nextID < id && id < newID) ||
                     (newID < nextID && nextID < id) ||
-                    (nextID == id)) { 
+                    (nextID == id)) {
+            	System.out.println("Correct Position");
                 // Send CORRECTPOSITION message
                 outStream.println(ConnectionCodes.CORRECTPOSITION);
                 outStream.flush();

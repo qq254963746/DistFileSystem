@@ -128,8 +128,6 @@ public class Server implements Runnable {
                         // Setup the appropriate class
                         ServCheckPosition dscp = 
                                 new ServCheckPosition(client);
-                        //dscp.run();
-                        //dscp = null;
                         // Setup and start the thread, so it doesn't block
                         Thread enterDSCP = new Thread (dscp);
                         enterDSCP.start();
