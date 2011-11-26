@@ -39,7 +39,7 @@ public class Server implements Runnable {
         
         try {
             this.sock = new ServerSocket(this.distConfig.get_servPortNumber());
-            this.sock.setSoTimeout(distConfig.getServertimeout());
+            //this.sock.setSoTimeout(distConfig.getServertimeout());
         }
         catch (IOException e) {
             // The socket could not be created
