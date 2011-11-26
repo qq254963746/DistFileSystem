@@ -94,7 +94,7 @@ public class DistFileSystemMain {
 			cnp.run();
 			cnp = null;
 			
-			/*// Connect to the successor
+			// Connect to the successor
 			System.out.printf("Connecting to successor %s\n", succ[1]);
 			ClntNewSuccessor cns = new ClntNewSuccessor(cli);
 			cns.run();
@@ -107,7 +107,6 @@ public class DistFileSystemMain {
 			cnn = null;
 			
 			System.out.println ("Connected to the network\n");
-			*/
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
