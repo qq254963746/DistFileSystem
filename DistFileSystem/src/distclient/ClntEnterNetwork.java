@@ -11,6 +11,7 @@ import java.net.Socket;
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distfilelisting.UserManagement;
+import distnodelisting.NodeSearchTable;
 
 public class ClntEnterNetwork implements Runnable {
 	String host;
@@ -70,6 +71,7 @@ public class ClntEnterNetwork implements Runnable {
             
             int id = Integer.parseInt(in.readLine());
             client.setId(id);
+            NodeSearchTable.get_Instance().set_OwnID(Integer.toString(id));
             System.out.println(id);
             
             outStream.println(ConnectionCodes.ENTERNETWORK);

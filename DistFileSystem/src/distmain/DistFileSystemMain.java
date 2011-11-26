@@ -79,7 +79,7 @@ public class DistFileSystemMain {
 			nextID = cli.getServId();
 			nextIP = cli.getServIp();
 			
-			/*// Locate the servers location
+			// Locate the servers location
 			System.out.printf("Entering network at %s\n", nextIP);
 			ClntCheckPosition ccp = new ClntCheckPosition(nextIP, nextID, cli);
 			ccp.run();
@@ -88,7 +88,7 @@ public class DistFileSystemMain {
 			String[] pred = cli.getPredecessor();
 			String[] succ = cli.getSuccessor();
 			
-			// Connect to the predecessor
+			/*// Connect to the predecessor
 			System.out.printf("Connecting to predecessor %s\n", pred[1]);
 			ClntNewPredecessor cnp = new ClntNewPredecessor(cli);
 			cnp.run();

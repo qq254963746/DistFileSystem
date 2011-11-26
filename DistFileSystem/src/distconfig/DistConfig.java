@@ -43,6 +43,8 @@ public class DistConfig implements Serializable {
     	}
     	
     	this.rootpath = this.rootpath + "/home";
+    	
+    	this.CURRNODES = 1;
     }
     
     public static DistConfig get_Instance () {

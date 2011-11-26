@@ -167,4 +167,8 @@ public class NodeSearchTable extends Vector<String[]> {
     	}
     }
     
+    public void set_OwnID (String id) {
+    	this.own[0] = id;
+    }
+    
 }

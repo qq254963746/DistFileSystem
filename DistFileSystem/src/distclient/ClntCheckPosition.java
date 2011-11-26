@@ -26,7 +26,7 @@ public class ClntCheckPosition implements Runnable {
 	public ClntCheckPosition(String host, int id, Client client){
 		this.host = host;
 		this.client = client;
-		this.id = id;
+		this.id = Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
 				
 	}
 
