@@ -99,12 +99,12 @@ public class DistFileSystemMain {
 			ClntNewSuccessor cns = new ClntNewSuccessor(cli);
 			cns.run();
 			cns = null;
-			/*
+			
 			// Send new node notification
 			System.out.printf("Sending the new node notification\n");
 			ClntNewNode cnn = new ClntNewNode(succ[1]);
 			cnn.run();
-			cnn = null;*/
+			cnn = null;
 			
 			System.out.println ("Connected to the network\n");
 		} 
