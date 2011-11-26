@@ -105,8 +105,10 @@ public class ClntNewSuccessor implements Runnable {
 	        System.out.println(in.readLine());
 	        
 		} catch (IOException e) {
+			System.out.println("Inside ClntNewSuccessor");
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
+			System.out.println("Inside ClntNewSuccessor");
 			e.printStackTrace();
 		}
 	}

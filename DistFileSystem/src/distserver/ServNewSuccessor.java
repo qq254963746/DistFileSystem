@@ -129,6 +129,7 @@ public class ServNewSuccessor implements Runnable {
 		}
 		
 		catch (IOException ex) {
+			System.out.println("Inside ServNewSuccessor");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
