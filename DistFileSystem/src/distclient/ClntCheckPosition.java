@@ -70,6 +70,7 @@ public class ClntCheckPosition implements Runnable {
 	        outStream.flush();
 	        
 	        String tmpline = in.readLine();
+	        System.out.println("Position Code " + tmpline);
 	        
 	        if (Integer.parseInt(tmpline) == ConnectionCodes.NEWID) {
 	            id = Integer.parseInt(in.readLine());
