@@ -71,6 +71,7 @@ public class ServCheckPosition implements Runnable {
             String newNodeID = (String)inStream.readLine();
             int newID = Integer.parseInt(newNodeID);
             System.out.printf("Recieved ID as %d\n", newID);
+            System.out.flush();
             
             NodeSearchTable dct = NodeSearchTable.get_Instance();
             
@@ -80,20 +81,17 @@ public class ServCheckPosition implements Runnable {
             // If own ID = the new nodes ID, create a new ID for it
             if (newID == id) {
                 newID = (newID + 1) % distConfig.get_MaxNodes();
-                System.out.println("Sending NewID");
-                System.out.flush();
                 outStream.println(ConnectionCodes.NEWID);
                 outStream.flush();
                 System.out.println("Sending ID as " + Integer.toString(newID));
                 System.out.flush();
                 outStream.println(Integer.toString(newID));
                 outStream.flush();
-                System.out.println("Finished with new node ID");
-                System.out.flush();
                 // Now continue with the check
             }
             
-            System.out.printf("Own ID: %d\tPred ID: %d", id, Integer.parseInt(dct.get_predecessorID()));
+            System.out.printf("Own ID: %d\tPred ID: %d\n", id, Integer.parseInt(dct.get_predecessorID()));
+            System.out.flush();
             // Check if the new node's ID is between the current ID and the next
             int nextID = Integer.parseInt(dct.get_IDAt(0));
             // If the new ID is between this ID and the next
