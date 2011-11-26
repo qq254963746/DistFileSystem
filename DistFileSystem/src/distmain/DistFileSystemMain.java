@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.Vector;
 
 import distclient.*;
+import distconfig.Sha1Generator;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 import distserver.Server;
@@ -78,7 +79,7 @@ public class DistFileSystemMain {
 			nextID = cli.getServId();
 			nextIP = cli.getServIp();
 			
-			// Locate the servers location
+			/*// Locate the servers location
 			System.out.printf("Entering network at %s\n", nextIP);
 			ClntCheckPosition ccp = new ClntCheckPosition(nextIP, nextID, cli);
 			ccp.run();
@@ -106,7 +107,7 @@ public class DistFileSystemMain {
 			cnn = null;
 			
 			System.out.println ("Connected to the network\n");
-			
+			*/
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -130,6 +131,15 @@ public class DistFileSystemMain {
 					for(int index = 0; index < this.nst.size(); index++) {
 						System.out.printf("Entry: %d\tID: %s\tIP: %s\n",
 								index, this.nst.get_IDAt(index), this.nst.get_IPAt(index));
+					}
+				}
+				else if (input.equals("view own information")) {
+					System.out.printf("ID: %s\nIP: %s\n", this.nst.get_ownID(), this.nst.get_ownIPAddress());
+				}
+				else if (input.contains("sha1")) {
+					String[] vals = input.split(" ");
+					for (int index = 0; index < vals.length; index++) {
+						System.out.printf("%s :\t%s\n", vals[index], Sha1Generator.generate_Sha1(vals[index]));
 					}
 				}
 				
