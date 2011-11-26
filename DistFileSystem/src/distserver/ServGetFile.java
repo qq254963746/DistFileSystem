@@ -228,6 +228,7 @@ class ServGetFile implements Runnable {
 		}
 		
 		catch (IOException ex) {
+			System.out.println("Inside ServGetFile");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
 	}
