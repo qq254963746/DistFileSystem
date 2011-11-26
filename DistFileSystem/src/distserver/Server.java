@@ -86,7 +86,7 @@ public class Server implements Runnable {
                 
                 System.out.println("Waiting for connection");
                 client = sock.accept();
-                System.out.println("Connection from " + client.getInetAddress());
+                System.out.println("Connection from " + client.getInetAddress().getHostAddress());
                 
                 BufferedReader in = new BufferedReader (
                         new InputStreamReader (

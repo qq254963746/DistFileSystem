@@ -33,6 +33,7 @@ public class ServNewPredecessor implements Runnable {
 	
 	private Socket client = null;
 	private DistConfig distConfig = null;
+	private String outputFormat = "%s, in ServNewPredecessor\n";
 	
 	/**
 	 * 
@@ -51,20 +52,26 @@ public class ServNewPredecessor implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
+            System.out.printf(outputFormat, "Got input stream");
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.printf(outputFormat, "Got output stream");
             // Setup the object writer to the client
             ObjectOutputStream oos = new ObjectOutputStream (bos);
+            System.out.printf(outputFormat, "Got object output stream");
             
             // Send acknowledgment everything is set
+            System.out.printf(outputFormat, "Sending ack");
             outStream.println(ConnectionCodes.NEWPREDECESSOR);
             outStream.flush();
             
             // Get the ID of the new Predecessor
+            System.out.printf(outputFormat, "Recieving new ID");
             int newPredID = Integer.parseInt(inStream.readLine());
+            System.out.printf(outputFormat, "Recieved %d", newPredID);
             
             // Get the list of files that will be transfered to the new node
             Vector<FileObject> filesToTransfer = LocalPathList.get_Instance().get_filesBetween(
@@ -72,6 +79,7 @@ public class ServNewPredecessor implements Runnable {
             		Integer.parseInt(NodeSearchTable.get_Instance().get_IDAt(0)));
             
             // Send the list of files to be transfered
+            System.out.printf(outputFormat, "Sending the list of files");
             oos.writeObject(filesToTransfer);
             oos.flush();
             
@@ -80,6 +88,7 @@ public class ServNewPredecessor implements Runnable {
             
             // Send each file individually
             // Loop through each file in the transfer set an send them to the new client
+            System.out.printf(outputFormat, "Looping through the files to send");
             for (FileObject f : filesToTransfer) {
             	// Get the name of the file to transfer
             	String fileName = f.getName();
@@ -114,9 +123,10 @@ public class ServNewPredecessor implements Runnable {
             
             // Add the new predecessor to search list
             NodeSearchTable nst = NodeSearchTable.get_Instance();
-            nst.set_predicessor(Integer.toString(newPredID), client.getInetAddress().toString());
+            nst.set_predicessor(Integer.toString(newPredID), client.getInetAddress().getHostAddress());
             
             // Send confirmation
+            System.out.printf(outputFormat, "Sending ack");
             outStream.println(ConnectionCodes.NEWPREDECESSOR);
             outStream.flush();
             

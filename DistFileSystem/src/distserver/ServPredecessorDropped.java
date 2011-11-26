@@ -60,7 +60,7 @@ public class ServPredecessorDropped implements Runnable {
 	        String newPredID = inStream.readLine();
 	        
 	        // Set the new predecessor
-	        nst.set_predicessor(newPredID, client.getInetAddress().toString());
+	        nst.set_predicessor(newPredID, client.getInetAddress().getHostAddress());
 	        
 	        // Exchange Files
 	        ServHeartBeat shb = new ServHeartBeat(this.client, true);

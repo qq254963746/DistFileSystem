@@ -43,6 +43,7 @@ class ServSetupSearchTable implements Runnable {
 	public void run() {
 		
 		try {
+			System.out.println("Inside thread for ServSetupSearchTable");
 	        // Get the input stream for the client
 	        BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(client.getInputStream()));
@@ -53,9 +54,11 @@ class ServSetupSearchTable implements Runnable {
 	        PrintWriter outStream = new PrintWriter(bos, false);
 	        
 	        // Send that the server is ready to receive
+	        System.out.println("Sending ack, in ServSetupSearchTable");
 	        outStream.println(ConnectionCodes.SETUPSEARCHTABLE);
 	        outStream.flush();
 	        
+	        System.out.println("Getting ID and IP, in ServSetupSearchTable");
 	        // Receive the ID and IP of the client
 	        int newID = Integer.parseInt(inStream.readLine());
 	        String newIP = inStream.readLine();
@@ -98,6 +101,7 @@ class ServSetupSearchTable implements Runnable {
 	    	}
 	    	
 	    	// Send that the table has been updated
+	    	System.out.println("Sending ack, in ServSetupSearchTable");
 	    	outStream.println(ConnectionCodes.SETUPSEARCHTABLE);
 	    	outStream.flush();
 	    	

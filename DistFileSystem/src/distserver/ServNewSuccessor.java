@@ -34,6 +34,7 @@ public class ServNewSuccessor implements Runnable {
 	
 	private Socket client = null;
 	private DistConfig distConfig = null;
+	private String outputformat = "%s, in ServNewSuccessor\n";
 	
 	/**
 	 * 
@@ -52,13 +53,16 @@ public class ServNewSuccessor implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
+            System.out.printf(outputformat, "Got input stream");
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.printf(outputformat, "Got output stream");
             // Setup the object writer to the client
             ObjectOutputStream oos = new ObjectOutputStream (bos);
+            System.out.printf(outputformat, "Got object output stream");
             
             // Send acknowledgment everything is set
             outStream.println(ConnectionCodes.NEWSUCCESSOR);
@@ -116,7 +120,7 @@ public class ServNewSuccessor implements Runnable {
             
             // Add the new predecessor to search list
             NodeSearchTable nst = NodeSearchTable.get_Instance();
-            nst.set(0, Integer.toString(newSuccID), client.getInetAddress().toString());
+            nst.set(0, Integer.toString(newSuccID), client.getInetAddress().getHostAddress());
             
             // Send confirmation
             outStream.println(ConnectionCodes.NEWSUCCESSOR);
