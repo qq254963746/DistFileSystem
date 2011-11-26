@@ -69,8 +69,9 @@ public class ServCheckPosition implements Runnable {
             // Receive the new node's ID
             System.out.println("Waiting for node ID");
             String newNodeID = inStream.readLine();
+            System.out.println("Recieved ID sas " + newNodeID);
             int newID = Integer.parseInt(newNodeID);
-            System.out.println("Recieved ID as " + newNodeID);
+            
             System.out.printf("Recieved ID as %d\n", newID);
             System.out.flush();
             
