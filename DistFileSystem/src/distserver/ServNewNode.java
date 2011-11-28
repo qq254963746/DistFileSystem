@@ -40,6 +40,7 @@ public class ServNewNode implements Runnable {
 	@Override
 	public void run() {
 		try {
+			System.out.println("Inside thread for ServNewNode");
 	        // Get the input stream for the client
 	        BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(client.getInputStream()));
@@ -87,6 +88,27 @@ public class ServNewNode implements Runnable {
 	        // If the newID is not the same as this servers ID
 	        //		aka, it hasn't made it all the way around the network yet
 	        if (!(newID == myID)) {
+	        	// If the new ID is between my ID and the predecessor's ID,
+				// Set the new ID to be the predecessor
+				if (NodeSearchTable.is_between(newID, Integer.parseInt(nst.get_predecessorID()), myID) ||
+						myID == Integer.parseInt(nst.get_predecessorID())) {
+		    		nst.set_predicessor(Integer.toString(newID), newIP);
+		    	}
+		    	
+				// Loop through each element of the search table and check to see
+				// if the new ID fits in any of them
+		    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
+		    	for (int index = 0; index < nst.size(); index++) {
+		    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
+		    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
+		    		
+		    		// If the new ID is between the potential ID for this slot
+		    		// and the current ID set to this slot, then set it.
+		    		if (NodeSearchTable.is_between(newID, potID, currSearchID)) {
+		    			nst.set(index, Integer.toString(newID), newIP);
+		    		}
+		    	}
+		    	
 	        	// Alter the search table and send the newIP and newID along to the next server
 	        	//this.pushNewIDAndIP(newID, newIP, username, myID);
 	        	// Send this node's information to the new node
@@ -106,29 +128,8 @@ public class ServNewNode implements Runnable {
 	 * @param newIP : The string representation of the new node's IP
 	 * @param myID : The integer representation of this node's ID
 	 */
-	private void pushNewIDAndIP (int newID, String newIP, String newUser, int myID) {
+	/*private void pushNewIDAndIP (int newID, String newIP, String newUser, int myID) {
 		try {
-			// If the new ID is between my ID and the predecessor's ID,
-			// Set the new ID to be the predecessor
-			if (NodeSearchTable.is_between(newID, Integer.parseInt(nst.get_predecessorID()), myID) ||
-					myID == Integer.parseInt(nst.get_predecessorID())) {
-	    		nst.set_predicessor(Integer.toString(newID), newIP);
-	    	}
-	    	
-			// Loop through each element of the search table and check to see
-			// if the new ID fits in any of them
-	    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
-	    	for (int index = 0; index < nst.size(); index++) {
-	    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
-	    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
-	    		
-	    		// If the new ID is between the potential ID for this slot
-	    		// and the current ID set to this slot, then set it.
-	    		if (NodeSearchTable.is_between(newID, potID, currSearchID)) {
-	    			nst.set(index, Integer.toString(newID), newIP);
-	    		}
-	    	}
-	    	
 	    	System.out.printf("Connecting to %s, in push in ServNewNode\n", nst.get_IPAt(0));
 	    	// Setup the socket to the next node, and the write and read buffers
 	    	Socket sock = new Socket(nst.get_IPAt(0), DistConfig.get_Instance().get_servPortNumber());
@@ -174,7 +175,7 @@ public class ServNewNode implements Runnable {
 	 * 
 	 * @param newIP : The string representation of the IP for the new node
 	 */
-	private void sendOwnInfo(String newIP) {
+	/*private void sendOwnInfo(String newIP) {
 		try {
 			System.out.printf("Connecting to %s, in send in ServNewNode\n", newIP);
 			// Setup the socket for the new node and input and output buffers
@@ -201,6 +202,7 @@ public class ServNewNode implements Runnable {
 			outStream.flush();
 			
 			// receive confirmation
+			System.out.println("Receiving ack, in send in ServNewNode");
 			inStream.readLine();
 			
 			// Close connection
@@ -214,5 +216,5 @@ public class ServNewNode implements Runnable {
 			System.out.println("Inside send ServNewNode");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
-	}
+	}*/
 }
