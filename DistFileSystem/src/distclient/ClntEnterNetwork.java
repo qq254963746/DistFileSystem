@@ -89,6 +89,8 @@ public class ClntEnterNetwork implements Runnable {
             outStream.println(ConnectionCodes.ENTERNETWORK);
             outStream.flush();
             
+            sock.close();
+            
 		} catch (IOException e) {
 			e.printStackTrace();
 			

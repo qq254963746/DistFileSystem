@@ -124,7 +124,8 @@ public class ClntGetFile implements Runnable {
 			        	response = in.readLine();
 				        System.out.println("Received backup IP: " + response);
 				        
-			        	client.addTask(new ClntGetFile(response, this.client, this.file, this.username, true));
+				        sock.close();
+				        client.addTask(new ClntGetFile(response, this.client, this.file, this.username, true));
 			        	
 			        } else {
 			        	response = in.readLine();
@@ -132,6 +133,9 @@ public class ClntGetFile implements Runnable {
 			        	
 			        }
 			        
+			        if (!sock.isClosed())
+			        	sock.close();
+
 		        	return;
 		        }
 	        	
@@ -139,11 +143,14 @@ public class ClntGetFile implements Runnable {
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
+		        sock.close();
 		        client.addTask(new ClntGetFile(nextHost, this.client, this.file, this.username));
 		        return;
 	        	
 	        }
 	        
+	        if (!sock.isClosed()) 
+	        	sock.close();
 	        return;
 	        
 		} catch (IOException e) {

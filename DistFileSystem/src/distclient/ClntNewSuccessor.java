@@ -104,6 +104,7 @@ public class ClntNewSuccessor implements Runnable {
 
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
+	        sock.close();
 	        
 		} catch (IOException e) {
 			System.out.println("Inside ClntNewSuccessor");

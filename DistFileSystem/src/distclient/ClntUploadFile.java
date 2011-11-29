@@ -96,9 +96,11 @@ public class ClntUploadFile implements Runnable {
                     }
 		        	
 		        	System.out.println("Received " + in.readLine());
+		        	sock.close();
 		        	return;
 			        	
 			    } else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
+			    	sock.close();
 			    	return;
 			    }
 	        	
@@ -109,11 +111,14 @@ public class ClntUploadFile implements Runnable {
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
+		        sock.close();
 		        client.addTask(new ClntUploadFile(nextHost, this.client, this.file, this.username));
 		        return;
 	        	
 	        }
 	        
+	        if (!sock.isClosed())
+	        	sock.close();
 	        return;
 	        
 		} catch (IOException e) {
