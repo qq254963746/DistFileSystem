@@ -102,6 +102,7 @@ public class ServNewPredecessor implements Runnable {
             	// Read the bytes from the file, sending them to the client
             	while ((bytesRead = fis.read(buffer)) > 0) {
             		oos.writeObject(bytesRead);
+            		oos.flush();
             		oos.writeObject(Arrays.copyOf(buffer, buffer.length));
             		oos.flush();
             	}

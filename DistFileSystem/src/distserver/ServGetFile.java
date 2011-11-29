@@ -175,6 +175,7 @@ class ServGetFile implements Runnable {
 	                        Integer bytesRead = 0;
 	                        while ((bytesRead = fis.read(buffer)) > 0) {
 	                        	oos.writeObject(bytesRead);
+	                        	oos.flush();
 	                        	oos.writeObject(Arrays.copyOf(buffer, buffer.length));
 	                        	oos.flush();
 	                        }

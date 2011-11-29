@@ -129,6 +129,7 @@ public class ServHeartBeat implements Runnable {
             	// and sending them to the new client
             	while ((bytesRead = fis.read(buffer)) > 0) {
             		oos.writeObject(bytesRead);
+            		oos.flush();
             		oos.writeObject(Arrays.copyOf(buffer, buffer.length));
             		oos.flush();
             	}

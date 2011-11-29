@@ -105,6 +105,7 @@ public class ServCheckPosition implements Runnable {
                 String[] ownInfo = { Integer.toString(id), 
                     dct.get_ownIPAddress() };
                 oos.writeObject(ownInfo);
+                oos.flush();
                 // Send the string array of the next id and ip
                 String[] nextInfo = { Integer.toString(nextID), 
                     dct.get_IPAt(0) };
