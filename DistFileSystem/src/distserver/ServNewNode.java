@@ -112,7 +112,7 @@ public class ServNewNode implements Runnable {
 	        	// Alter the search table and send the newIP and newID along to the next server
 	        	this.pushNewIDAndIP(newID, newIP, username, myID);
 	        	// Send this node's information to the new node
-	        	//this.sendOwnInfo(newIP);
+	        	this.sendOwnInfo(newIP);
 	        }
 		}
 		
