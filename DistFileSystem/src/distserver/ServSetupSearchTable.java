@@ -69,22 +69,14 @@ class ServSetupSearchTable implements Runnable {
 	        
 	        // Check if the new ID is between the current ID and its predecessor
 	        // First check if the new ID is less than the local ID and greater than the predecessor ID
-	        if (newID < myID && newID > predecessorID) {
+	        System.out.println("Checking Predecessor");
+	        if (NodeSearchTable.is_between(newID, predecessorID, myID) ||
+	        		predecessorID == myID) { 
 	    		nst.set_predicessor(Integer.toString(newID), newIP);
 	    	}
-	        // Else if the new ID is less than the local ID
-	        // and the new ID is less than the predecessor ID
-	        // and the predecessor is greater than the local ID
-	        else if (newID < myID && newID > predecessorID && myID < predecessorID) {
-	        	nst.set_predicessor(Integer.toString(newID), newIP);
-	        }
-	        // Else if the newID is greater than the local ID
-	        // and the new ID is greater than the predecessor ID
-	        else if (newID > myID && newID > predecessorID) {
-	        	nst.set_predicessor(Integer.toString(newID), newIP);
-	        }
-	    	
+	        
 	        // Loop through the search table and update it where needed
+	        System.out.println("Checking each index");
 	    	for (int index = 0; index < nst.size(); index++) {
 	    		// Get the potential ID for the slot in the table
 	    		int potID = NodeSearchTable.get_SlotPotentialID(index);

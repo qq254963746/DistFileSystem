@@ -90,6 +90,7 @@ public class ServNewNode implements Runnable {
 	        if (!(newID == myID)) {
 	        	// If the new ID is between my ID and the predecessor's ID,
 				// Set the new ID to be the predecessor
+	        	System.out.println("Checking predecessor");
 				if (NodeSearchTable.is_between(newID, Integer.parseInt(nst.get_predecessorID()), myID) ||
 						myID == Integer.parseInt(nst.get_predecessorID())) {
 		    		nst.set_predicessor(Integer.toString(newID), newIP);
@@ -97,6 +98,7 @@ public class ServNewNode implements Runnable {
 		    	
 				// Loop through each element of the search table and check to see
 				// if the new ID fits in any of them
+				System.out.println("Checking each index");
 		    	for (int index = 0; index < nst.size(); index++) {
 		    		int potID = NodeSearchTable.get_SlotPotentialID(index);
 		    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));

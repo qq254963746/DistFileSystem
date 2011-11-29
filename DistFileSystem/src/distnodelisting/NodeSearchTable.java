@@ -161,6 +161,9 @@ public class NodeSearchTable extends Vector<String[]> {
     }
     
     public static boolean is_between (int newID, int prevID, int nextID) {
+    	System.out.println("---------");
+    	System.out.printf("new: %d\tprev: %d\tnext: %d\n", newID, prevID, nextID);
+    	System.out.println("---------");
     	if ((prevID < newID && newID < nextID) || 
                 (nextID < prevID && prevID < newID) ||
                 (newID < nextID && nextID < prevID)) {
