@@ -172,6 +172,7 @@ public class Server implements Runnable {
                         enterDSST.start();
                         this.backgrounded.add(enterDSST);
                         enterDSST = null;
+                        break;
                     case ConnectionCodes.GETFILE:
                     	// Setup the appropriate class
                         ServGetFile dsgf = 
@@ -181,6 +182,7 @@ public class Server implements Runnable {
                         enterDSGF.start();
                         this.backgrounded.add(enterDSGF);
                         enterDSGF = null;
+                        break;
                     case ConnectionCodes.UPLOADFILE:
                     	// Setup the appropriate class
                         ServUploadFile dsuf = 

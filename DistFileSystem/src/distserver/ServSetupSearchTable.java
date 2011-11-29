@@ -62,7 +62,7 @@ class ServSetupSearchTable implements Runnable {
 	        // Receive the ID and IP of the client
 	        int newID = Integer.parseInt(inStream.readLine());
 	        String newIP = inStream.readLine();
-	        /*
+	        
 	        // Get the node search table and the local ID
 	        NodeSearchTable nst = NodeSearchTable.get_Instance();
 	        int myID = Integer.parseInt(nst.get_ownID());
@@ -99,7 +99,7 @@ class ServSetupSearchTable implements Runnable {
 	    			nst.set(index, Integer.toString(newID), newIP);
 	    		}
 	    	}
-	    	*/
+	    	
 	    	// Send that the table has been updated
 	    	System.out.println("Sending ack, in ServSetupSearchTable");
 	    	outStream.println(ConnectionCodes.SETUPSEARCHTABLE);
