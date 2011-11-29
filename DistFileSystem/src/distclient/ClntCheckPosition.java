@@ -99,7 +99,6 @@ public class ClntCheckPosition implements Runnable {
 	            
 	            System.out.println("Wrong Position");
 	            System.out.println("next ID = " + nextTestId);
-	            client.setId(nextTestId);
 	            
 	            System.out.println("next IP = " + nextTestIp);
 	            ClntCheckPosition ccp = new ClntCheckPosition (nextTestIp, client);
