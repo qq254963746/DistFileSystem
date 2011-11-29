@@ -110,7 +110,7 @@ public class ServNewNode implements Runnable {
 		    	}
 		    	
 	        	// Alter the search table and send the newIP and newID along to the next server
-	        	//this.pushNewIDAndIP(newID, newIP, username, myID);
+	        	this.pushNewIDAndIP(newID, newIP, username, myID);
 	        	// Send this node's information to the new node
 	        	//this.sendOwnInfo(newIP);
 	        }
@@ -128,7 +128,7 @@ public class ServNewNode implements Runnable {
 	 * @param newIP : The string representation of the new node's IP
 	 * @param myID : The integer representation of this node's ID
 	 */
-	/*private void pushNewIDAndIP (int newID, String newIP, String newUser, int myID) {
+	private void pushNewIDAndIP (int newID, String newIP, String newUser, int myID) {
 		try {
 	    	System.out.printf("Connecting to %s, in push in ServNewNode\n", nst.get_IPAt(0));
 	    	// Setup the socket to the next node, and the write and read buffers
@@ -175,7 +175,7 @@ public class ServNewNode implements Runnable {
 	 * 
 	 * @param newIP : The string representation of the IP for the new node
 	 */
-	/*private void sendOwnInfo(String newIP) {
+	private void sendOwnInfo(String newIP) {
 		try {
 			System.out.printf("Connecting to %s, in send in ServNewNode\n", newIP);
 			// Setup the socket for the new node and input and output buffers
@@ -216,5 +216,5 @@ public class ServNewNode implements Runnable {
 			System.out.println("Inside send ServNewNode");
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
         }
-	}*/
+	}
 }
