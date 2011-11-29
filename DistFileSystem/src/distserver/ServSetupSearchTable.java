@@ -93,7 +93,8 @@ class ServSetupSearchTable implements Runnable {
 	    		
 	    		// if the new ID is between the potential ID and the current ID
 	    		// in the slot update it
-	    		if (NodeSearchTable.is_between(newID, potID, currSearchID)) {
+	    		if (NodeSearchTable.is_between(newID, potID, currSearchID) || 
+	    				newID == potID || currSearchID == myID) {
 	    			nst.set(index, Integer.toString(newID), newIP);
 	    		}
 	    	}
