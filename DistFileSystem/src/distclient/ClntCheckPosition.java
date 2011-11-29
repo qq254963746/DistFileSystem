@@ -92,6 +92,7 @@ public class ClntCheckPosition implements Runnable {
 	            System.out.println("Next IP = " + successor[Constants.IP_ADDRESS]);
 	            client.setPredecessor(predecessor);
 	            client.setSuccessor(successor);
+	            sock.close();
 	        } else {
 	        	
 	            int nextTestId = Integer.parseInt(in.readLine());
@@ -101,6 +102,7 @@ public class ClntCheckPosition implements Runnable {
 	            System.out.println("next ID = " + nextTestId);
 	            
 	            System.out.println("next IP = " + nextTestIp);
+	            sock.close();
 	            ClntCheckPosition ccp = new ClntCheckPosition (nextTestIp, client);
 	            ccp.run();
 	            ccp = null;
