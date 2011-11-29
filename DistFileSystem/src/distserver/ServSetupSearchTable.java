@@ -86,10 +86,9 @@ class ServSetupSearchTable implements Runnable {
 	        }
 	    	
 	        // Loop through the search table and update it where needed
-	    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
 	    	for (int index = 0; index < nst.size(); index++) {
 	    		// Get the potential ID for the slot in the table
-	    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
+	    		int potID = NodeSearchTable.get_SlotPotentialID(index);
 	    		// Get the current ID held at that location
 	    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
 	    		

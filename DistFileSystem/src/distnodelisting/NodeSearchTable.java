@@ -33,7 +33,7 @@ public class NodeSearchTable extends Vector<String[]> {
     
     
     private NodeSearchTable () {
-    	int totalToSearch = (int)(Math.ceil(Math.sqrt(DistConfig.get_Instance().get_MaxNodes())));
+    	int totalToSearch = (int)(Math.floor(Math.sqrt(DistConfig.get_Instance().get_MaxNodes())));
         this.setSize(totalToSearch);
         try {
         	Enumeration<NetworkInterface> netInts = NetworkInterface.getNetworkInterfaces();
@@ -156,6 +156,10 @@ public class NodeSearchTable extends Vector<String[]> {
         return false;
     }
     
+    public void set_OwnID (String id) {
+    	this.own[0] = id;
+    }
+    
     public static boolean is_between (int newID, int prevID, int nextID) {
     	if ((prevID < newID && newID < nextID) || 
                 (nextID < prevID && prevID < newID) ||
@@ -167,8 +171,10 @@ public class NodeSearchTable extends Vector<String[]> {
     	}
     }
     
-    public void set_OwnID (String id) {
-    	this.own[0] = id;
+    public static int get_SlotPotentialID(int slotIndex) {
+    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
+    	int myID = Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
+    	return (int) ((myID + Math.pow(slotIndex, 2)) % maxNodes);
     }
     
 }

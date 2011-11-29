@@ -97,9 +97,8 @@ public class ServNewNode implements Runnable {
 		    	
 				// Loop through each element of the search table and check to see
 				// if the new ID fits in any of them
-		    	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
 		    	for (int index = 0; index < nst.size(); index++) {
-		    		int potID = (int) ((myID + Math.pow(2, index)) % maxNodes);
+		    		int potID = NodeSearchTable.get_SlotPotentialID(index);
 		    		int currSearchID = Integer.parseInt(nst.get_IDAt(index));
 		    		
 		    		// If the new ID is between the potential ID for this slot
