@@ -174,7 +174,7 @@ public class NodeSearchTable extends Vector<String[]> {
     public static int get_SlotPotentialID(int slotIndex) {
     	int maxNodes = DistConfig.get_Instance().get_MaxNodes();
     	int myID = Integer.parseInt(NodeSearchTable.get_Instance().get_ownID());
-    	return (int) ((myID + Math.pow(slotIndex, 2)) % maxNodes);
+    	return (int) ((myID + Math.pow((slotIndex+1), 2)) % maxNodes);
     }
     
 }
