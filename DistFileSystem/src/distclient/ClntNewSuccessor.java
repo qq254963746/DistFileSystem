@@ -22,7 +22,7 @@ public class ClntNewSuccessor implements Runnable {
 	private Client client;
 	
 	public ClntNewSuccessor(Client client){
-		this(client.getPredecessor()[Constants.IP_ADDRESS], client);
+		this(client.getSuccessor()[Constants.IP_ADDRESS], client);
 	}
 	
 	public ClntNewSuccessor(String host, Client client){
