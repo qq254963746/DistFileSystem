@@ -96,7 +96,7 @@ public class DistConfig implements Serializable {
     }
     
     public String get_rootPath () {
-    	return this.rootpath;
+    	return this.rootpath + System.getProperty("file.separator");
     }
 
 	public int getBufferSize() {

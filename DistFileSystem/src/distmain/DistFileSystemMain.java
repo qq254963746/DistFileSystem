@@ -139,7 +139,7 @@ public class DistFileSystemMain {
 						System.out.printf("%s :\t%s\n", vals[index], Sha1Generator.generate_Sha1(vals[index]));
 					}
 				}
-				else if (input.contains("Test")) {
+				else if (input.contains("test")) {
 					DistFileSystemTest dfst = new DistFileSystemTest ();
 					dfst.runTestCommand(input);
 				}

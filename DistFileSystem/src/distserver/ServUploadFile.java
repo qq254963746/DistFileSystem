@@ -62,17 +62,23 @@ public class ServUploadFile implements Runnable {
             // Get the input stream for the client
             BufferedReader inStream = new BufferedReader (
                     new InputStreamReader(client.getInputStream()));
-            // Create object input stream
-            ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+            System.out.println("Got inStream");
+
             // Get the output stream for the client
             BufferedOutputStream bos = new BufferedOutputStream (
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.println("Got PrintWriter");            
             
             // Send acknowledgment everything is set
+            System.out.println("Sending ack");
             outStream.println(ConnectionCodes.UPLOADFILE);
             outStream.flush();
+            
+            // Create object input stream
+            ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+            System.out.println("Got ObjectInputStream");
       
             // Get the file name
             String filename = inStream.readLine();
@@ -186,26 +192,26 @@ public class ServUploadFile implements Runnable {
             else {
             	System.out.println("This is not the correct node");
             	// Get the next server to checks ID and IP address
-            	int nextCheckID = Integer.parseInt(nst.get_IDAt(0));
-            	String nextCheckIP = nst.get_IPAt(0);
+            	int predID = Integer.parseInt(nst.get_ownID());
+            	String predIP = nst.get_ownIPAddress();
+            	int nextCheckID = predID;
+            	String nextCheckIP = predIP;
             	// Loop through all of the servers in the search table
-            	for (int index = 0; index < nst.size()-1; index++) {
-            		// Get the next two IDs
+            	for (int index = 0; index < nst.size(); index++) {
+            		// Get the next ID
             		int nextID = Integer.parseInt(nst.get_IDAt(index));
-            		int secondID = Integer.parseInt(nst.get_IDAt(index + 1));
-            		
             		// Check if the file hash lies between the two elements of the search table
             		// or if it is equal to one of them
-            		if (NodeSearchTable.is_between(fileHash, nextID, secondID) || 
-            				fileHash == nextID) {
+            		if (NodeSearchTable.is_between(fileHash, predID, nextID) || 
+            				fileHash == predID) {
             			nextCheckID = nextID;
             			nextCheckIP = nst.get_IPAt(index);
-            			continue;
+            			break;
             		}
             		
             		// If it wasn't between, set the next check ID to the second ID
-        			nextCheckID = secondID;
-        			nextCheckIP = nst.get_IPAt(index + 1);
+            		predID = nextID;
+            		predIP = nst.get_IPAt(index);
             	}
             	
             	// Send the wrong position signal

@@ -40,7 +40,7 @@ public class DistFileSystemTest {
 				}
 				fi = null;
 				int lastSlash = pathToFile.lastIndexOf(System.getProperty("file.separator"));
-				String filename = pathToFile.substring(lastSlash);
+				String filename = pathToFile.substring(lastSlash+1);
 				
 				System.out.printf("File Permissions (744): ");
 				String permissions = inStream.readLine();
@@ -50,7 +50,8 @@ public class DistFileSystemTest {
 				
 				Client cli = new Client();
 				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, pathToFile, this.userManage.get_ownUserName());
-				cli.addTask(cuf);
+				//cli.addTask(cuf);
+				cuf.run();
 				
 			}
 		}

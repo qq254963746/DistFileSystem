@@ -4,9 +4,12 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
@@ -50,18 +53,27 @@ public class ClntUploadFile implements Runnable {
 				break;
 			}
 			else {
-				this.host = nst.get_IDAt(index+1);
+				this.host = nst.get_IPAt(index+1);
 			}
 		}
 	}
+	
+	public ClntUploadFile (String host, Client client, FileObject file, String fullPath, String username) {
+		this.client = client;
+		this.file = file;
+		this.fullpath = fullPath;
+		this.username = username;
+		this.host = host;
+	}
+
 
 	@Override
 	public void run() {
 		try {
 	
 	    	DistConfig distConfig = DistConfig.get_Instance();
-	    	
-			System.out.println("Connecting");
+
+			System.out.printf("Connecting to %s\n", this.host);
 			Socket sock = new Socket(host, distConfig.get_servPortNumber());
 	
 	        sock.setSoTimeout(5000);
@@ -95,17 +107,20 @@ public class ClntUploadFile implements Runnable {
 	        String response = in.readLine();
 	        System.out.println("Received " + response);
 	        
-	        if (response.equals(ConnectionCodes.CORRECTPOSITION)) {
+	        if (Integer.parseInt(response) == ConnectionCodes.CORRECTPOSITION) {
+	        //if (response.equals(ConnectionCodes.CORRECTPOSITION)) {
 	        	System.out.println("Sending username as " + this.username);
 		        outStream.println(this.username);
 		        outStream.flush();
 		        
 		        oos.writeObject(this.file);
+		        oos.flush();
 		        
 		        response = in.readLine();
 		        System.out.println("Received " + response);
 		        
-		        if (response.equals(ConnectionCodes.AUTHORIZED)) {
+		        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
+		        //if (response.equals(ConnectionCodes.AUTHORIZED)) {
 
 		        	//String fullPathName = distConfig.get_rootPath() + this.file.getName();
 		        	String fullPathName = this.fullpath;
@@ -127,12 +142,16 @@ public class ClntUploadFile implements Runnable {
 		        	sock.close();
 		        	return;
 			        	
-			    } else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
+			    } 
+		        else if (Integer.parseInt(response) == ConnectionCodes.NOTAUTHORIZED) {
+		        //else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
 			    	sock.close();
 			    	return;
 			    }
 	        	
-	        } else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
+	        } 
+	        else if (Integer.parseInt(response) == ConnectionCodes.WRONGPOSITION) {
+	        //else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
 	        	int nextId = Integer.parseInt(in.readLine());
 		        System.out.println("Received next ID: " + nextId);
 		        
@@ -140,7 +159,9 @@ public class ClntUploadFile implements Runnable {
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
 		        sock.close();
-		        client.addTask(new ClntUploadFile(nextHost, this.client, this.file, this.username));
+		        //client.addTask(new ClntUploadFile(nextHost, this.client, this.file, this.username));
+		        ClntUploadFile cuf = new ClntUploadFile (nextHost, this.client, this.file, this.fullpath, this.username);
+		        cuf.run();
 		        return;
 	        	
 	        }
