@@ -87,6 +87,7 @@ public class ServUploadFile implements Runnable {
             // Check if this is the correct position.
             // Is the file hash between the predecessor ID and this ID
             // or equal to this ID
+            System.out.println("Testing if this is the correct node");
             if (NodeSearchTable.is_between(
             		fileHash, 
             		Integer.parseInt(nst.get_predecessorID()), 
@@ -95,6 +96,7 @@ public class ServUploadFile implements Runnable {
             	
             	// Send that this is the correct server
             	outStream.println(ConnectionCodes.CORRECTPOSITION);
+            	System.out.println("This is the correct node");
             	outStream.flush();
             	
             	// Get the user that is sending the file and the FileObject being sent
@@ -108,6 +110,7 @@ public class ServUploadFile implements Runnable {
             	
             	// Check to see if the file exists on the current server
             	// If it does not, then permit the upload
+            	System.out.println("Checking permissions");
             	if (localFile == null) {
             		isPermitted = true;
             	}
@@ -140,11 +143,13 @@ public class ServUploadFile implements Runnable {
             	
             	// If the upload is not permitted, send the not authorized signal
             	if (!isPermitted) {
+            		System.out.println("This is not permitted");
             		outStream.println(ConnectionCodes.NOTAUTHORIZED);
             		outStream.flush();
             	}
             	// If the upload is permitted, send the authorized signal and begin upload
             	else {
+            		System.out.println("This is permitted");
             		outStream.println(ConnectionCodes.AUTHORIZED);
             		outStream.flush();
             		
@@ -161,6 +166,7 @@ public class ServUploadFile implements Runnable {
             		FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + filetoupload.getName());
             		
             		// Upload the file
+            		System.out.println("Getting File");
             		do {
             			bytesRead = (Integer)ois.readObject();
             			buffer = (byte[])ois.readObject();
@@ -178,6 +184,7 @@ public class ServUploadFile implements Runnable {
             
             // else locate next server to check
             else {
+            	System.out.println("This is not the correct node");
             	// Get the next server to checks ID and IP address
             	int nextCheckID = Integer.parseInt(nst.get_IDAt(0));
             	String nextCheckIP = nst.get_IPAt(0);

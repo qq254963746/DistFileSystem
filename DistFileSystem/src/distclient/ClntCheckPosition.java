@@ -83,6 +83,7 @@ public class ClntCheckPosition implements Runnable {
 	        }
 	        
 	        if ( Integer.parseInt(tmpline) == ConnectionCodes.CORRECTPOSITION) {
+	        	System.out.println("Getting the predicessor ID");
 	            String[] predecessor = (String[])ois.readObject();
 	            System.out.println("Correct Position");
 	            System.out.println("Pred ID = " + predecessor[Constants.ID]);
