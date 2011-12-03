@@ -8,25 +8,27 @@ package distmain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
 import distclient.*;
+import distconfig.Constants;
 import distconfig.Sha1Generator;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 import distserver.Server;
 
 
+
 public class DistFileSystemMain {
 	
-	private String prompt = "%s : ";
+	private String prompt = "[%s]$ ";
 	private BufferedReader inStream;
 	private UserManagement userManage = null;
 	private NodeSearchTable nst = null;
+	private Client cli = new Client();
 	
 	private String ipAddress = null;
 	private Thread thServ = null;
-	private Vector<Thread> backgrounded = new Vector<Thread>();
 	
 	public DistFileSystemMain () {
 		try {
@@ -34,25 +36,57 @@ public class DistFileSystemMain {
 			userManage = UserManagement.get_Instance();
 			nst = NodeSearchTable.get_Instance();
 			
-			System.out.print("Username: ");
-			String userName = inStream.readLine();
+			System.out.print("Please input your username: ");
+			String userName = "";
+			do {
+				userName = inStream.readLine().trim();
+				if (userName.equals("")) {
+					System.out.print("Username must contain non-whitespace characters. Please try again: ");
+				}
+				
+			} while (userName.equals(""));
+			
 			userManage.set_ownUserName(userName);
 			
-			System.out.print("IP Of Net: ");
-			ipAddress = inStream.readLine();
+			
+			System.out.print("Would you like to [s]tart a network or [j]oin one that already exists?\n(s/j): ");
+			String response = "";
+			do {
+				response = inStream.readLine().trim().toUpperCase();
+				if (!(response.equals("S") || response.equals("J"))) {
+					System.out.print("Invalid input received. Try again.\n(s/j): ");
+				}
+			} while (!(response.equals("S") || response.equals("J")));
+			
+			ipAddress = "";
+			InetAddressValidator validator = InetAddressValidator.getInstance();
+
+
+			this.start_server();
+			switch (response) {
+				case "J":
+					System.out.print("Please input the IP address of the network you would like to join: ");
+					do {
+						ipAddress = inStream.readLine().trim();
+						if (!validator.isValidInet4Address(ipAddress)){
+							System.out.print("Invalid IPv4 address received. Try again: ");
+						}
+					} while (!validator.isValidInet4Address(ipAddress));
+
+					break;
+					
+				case "S":
+				default:
+					this.connect_to_network();
+				
+			}
+
+			this.run_interface();
+			
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		this.start_server();
-
-		// If IP address was given, connect to existing network
-		// Otherwise this will 
-		if (!ipAddress.equals(""))
-			this.connect_to_network();
-		
-		this.run_interface();
 	}
 	
 	public void start_server() {
@@ -67,7 +101,6 @@ public class DistFileSystemMain {
 			int nextID;
 			String nextIP;
 			
-			Client cli = new Client();
 			
 			// Connect to the network and get initial search location
 			// These have to all run in the same thread since they rely on each other
@@ -102,7 +135,7 @@ public class DistFileSystemMain {
 			
 			// Send new node notification
 			System.out.printf("Sending the new node notification\n");
-			ClntNewNode cnn = new ClntNewNode(succ[1]);
+			ClntNewNode cnn = new ClntNewNode(succ[Constants.IP_ADDRESS]);
 			cnn.run();
 			cnn = null;
 			
@@ -120,7 +153,62 @@ public class DistFileSystemMain {
 		while (!exit) {
 			try {
 				System.out.printf(this.prompt, this.userManage.get_ownUserName());
-				input = inStream.readLine();
+				input = inStream.readLine().toLowerCase().trim();
+				String[] instr = input.split(" ",2);
+				String path;
+				
+				switch (instr[0]) {
+				
+				case "write":
+					
+					if (instr.length > 1) {
+						path = instr[1].split(" ",1)[0].trim();
+						
+						if (canWrite(path)) {
+							//TODO
+						} else {
+							System.out.println("Can not write to \"" + path + "\".");
+						}
+						
+					}
+					
+					break;
+				
+				case "read":
+					
+					if (instr.length > 1) {
+						path = instr[1].split(" ",1)[0].trim();
+						
+						if (canRead(path) && exists(path)) {
+							//TODO
+						} else {
+							System.out.println("Can not read from \"" + path + "\" or it does not exist.");
+						}
+						
+					}
+					
+					break;
+
+				case "rm":
+					if (instr.length > 1) {
+						path = instr[1].split(" ",1)[0].trim();
+						
+						if (canWrite(path) && exists(path)) {
+							//TODO
+						} else {
+							System.out.println("Can not remove \"" + path + "\" or it does not exist.");
+						}
+						
+					}
+					
+					break;
+					
+				default:
+					System.out.println("Unrecognized command: \""+ instr[0] + "\".");
+					break;
+				}
+				
+				/*
 				
 				if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
@@ -141,6 +229,7 @@ public class DistFileSystemMain {
 						System.out.printf("%s :\t%s\n", vals[index], Sha1Generator.generate_Sha1(vals[index]));
 					}
 				}
+				*/
 				
 			}
 			
@@ -151,7 +240,24 @@ public class DistFileSystemMain {
 	}
 	
 	public static void main (String[] args) {
-		DistFileSystemMain dfsm = new DistFileSystemMain();
+		new DistFileSystemMain();
+	}
+	
+	public boolean exists(String path) {
+		// TODO
+		
+		return true;
+	}
+	
+	public boolean canWrite(String path) {
+		
+		// TODO
+		return true;
+	}
+	
+	public boolean canRead(String path) {
+		// TODO
+		return true;
 	}
 }
 
