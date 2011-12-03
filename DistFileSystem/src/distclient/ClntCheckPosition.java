@@ -95,7 +95,7 @@ public class ClntCheckPosition implements Runnable {
 	            client.setSuccessor(successor);
 	            sock.close();
 	        } else {
-	        	
+	        	System.out.println("Wrong Position");
 	            int nextTestId = Integer.parseInt(in.readLine());
 	            String nextTestIp = in.readLine();
 	            
