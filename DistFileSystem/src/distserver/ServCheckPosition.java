@@ -102,16 +102,22 @@ public class ServCheckPosition implements Runnable {
                 outStream.println(ConnectionCodes.CORRECTPOSITION);
                 outStream.flush();
                 // Send the string array of this id and ip
-                String[] ownInfo = { Integer.toString(id), 
-                    dct.get_ownIPAddress() };
-                oos.writeObject(ownInfo);
-                oos.flush();
+                //String[] ownInfo = { Integer.toString(id), 
+                //    dct.get_ownIPAddress() };
+                //oos.writeObject(ownInfo);
+                //oos.flush();
+                outStream.println(Integer.toString(id));
+                outStream.println(dct.get_ownIPAddress());
+                outStream.flush();
                 // Send the string array of the next id and ip
-                String[] nextInfo = { Integer.toString(nextID), 
-                    dct.get_IPAt(0) };
-                oos.writeObject(nextInfo);
+                //String[] nextInfo = { Integer.toString(nextID), 
+                //    dct.get_IPAt(0) };
+                //oos.writeObject(nextInfo);
                 // flush the output stream
-                oos.flush();
+                //oos.flush();
+                outStream.println(Integer.toString(nextID));
+                outStream.println(dct.get_IPAt(0));
+                outStream.flush();
             }
             // Else, discover what two nodes it is between
             else {

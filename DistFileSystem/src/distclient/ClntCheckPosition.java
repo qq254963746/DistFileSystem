@@ -84,11 +84,17 @@ public class ClntCheckPosition implements Runnable {
 	        
 	        if ( Integer.parseInt(tmpline) == ConnectionCodes.CORRECTPOSITION) {
 	        	System.out.println("Getting the predicessor ID");
-	            String[] predecessor = (String[])ois.readObject();
+	            //String[] predecessor = (String[])ois.readObject();
+	        	String[] predecessor = new String[2];
+	        	predecessor[Constants.ID] = in.readLine();
+	        	predecessor[Constants.IP_ADDRESS] = in.readLine();
 	            System.out.println("Correct Position");
 	            System.out.println("Pred ID = " + predecessor[Constants.ID]);
 	            System.out.println("Pred IP = " + predecessor[Constants.IP_ADDRESS]);
-	            String[] successor = (String[])ois.readObject();
+	            //String[] successor = (String[])ois.readObject();
+	            String[] successor = new String[2];
+	        	successor[Constants.ID] = in.readLine();
+	        	successor[Constants.IP_ADDRESS] = in.readLine();
 	            System.out.println("Next ID = " + successor[Constants.ID]);
 	            System.out.println("Next IP = " + successor[Constants.IP_ADDRESS]);
 	            client.setPredecessor(predecessor);
@@ -110,9 +116,10 @@ public class ClntCheckPosition implements Runnable {
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		} 
+		//catch (ClassNotFoundException e) {
+		//	e.printStackTrace();
+		//}
 	}
 
 }
