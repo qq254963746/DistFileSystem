@@ -14,18 +14,45 @@ import java.util.Arrays;
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
 import distfilelisting.FileObject;
+import distnodelisting.NodeSearchTable;
 
 public class ClntUploadFile implements Runnable {
 	private String host;
 	private Client client;
 	private FileObject file;
 	private String username;
+	private String fullpath;
 
 	public ClntUploadFile(String host, Client client, FileObject file, String username){
+		DistConfig distConfig = DistConfig.get_Instance();
 		this.host = host;
 		this.client = client;
 		this.file = file;
+		this.fullpath = distConfig.get_rootPath() + System.getProperty("file.separator") + file.getName();
 		this.username = username;
+	}
+	
+	public ClntUploadFile (Client client, FileObject file, String fullPath, String username) {
+		this.client = client;
+		this.file = file;
+		this.fullpath = fullPath;
+		this.username = username;
+		
+		// Get the first host to check
+		NodeSearchTable nst = NodeSearchTable.get_Instance();
+		this.host = null;
+		for (int index = 0; index < nst.size()-1; index++) {
+			if (NodeSearchTable.is_between(
+					this.file.get_hash(),
+					Integer.parseInt(nst.get_IDAt(index)), 
+					Integer.parseInt(nst.get_IDAt(index + 1)))) {
+				this.host = nst.get_IPAt(index);
+				break;
+			}
+			else {
+				this.host = nst.get_IDAt(index+1);
+			}
+		}
 	}
 
 	@Override
@@ -80,7 +107,8 @@ public class ClntUploadFile implements Runnable {
 		        
 		        if (response.equals(ConnectionCodes.AUTHORIZED)) {
 
-		        	String fullPathName = distConfig.get_rootPath() + this.file.getName();
+		        	//String fullPathName = distConfig.get_rootPath() + this.file.getName();
+		        	String fullPathName = this.fullpath;
 		        	
 		        	File toTransfer = new File (fullPathName);
 		        	

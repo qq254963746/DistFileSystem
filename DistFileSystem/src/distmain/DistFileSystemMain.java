@@ -8,7 +8,6 @@ package distmain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
 import distclient.*;
 import distconfig.Sha1Generator;
@@ -26,7 +25,6 @@ public class DistFileSystemMain {
 	
 	private String ipAddress = null;
 	private Thread thServ = null;
-	private Vector<Thread> backgrounded = new Vector<Thread>();
 	
 	public DistFileSystemMain () {
 		try {
@@ -140,6 +138,10 @@ public class DistFileSystemMain {
 					for (int index = 0; index < vals.length; index++) {
 						System.out.printf("%s :\t%s\n", vals[index], Sha1Generator.generate_Sha1(vals[index]));
 					}
+				}
+				else if (input.contains("Test")) {
+					DistFileSystemTest dfst = new DistFileSystemTest ();
+					dfst.runTestCommand(input);
 				}
 				
 			}

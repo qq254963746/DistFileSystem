@@ -106,7 +106,7 @@ public class ServNewNode implements Runnable {
 		    		// If the new ID is between the potential ID for this slot
 		    		// and the current ID set to this slot, then set it.
 		    		if (NodeSearchTable.is_between(newID, potID, currSearchID) ||
-		    				newID == potID || currSearchID == myID) {
+		    				newID == potID) {
 		    			nst.set(index, Integer.toString(newID), newIP);
 		    		}
 		    	}

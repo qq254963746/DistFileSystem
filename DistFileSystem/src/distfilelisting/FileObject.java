@@ -40,6 +40,18 @@ public class FileObject implements Serializable {
 		this.lastupdate = new Date();
 	}
 	
+	public FileObject (String name, String permissions, String owner, String group) {
+		this.name = name;
+		int perms[] = FileObject.get_permissionsFromString(permissions);
+		this.ownerPermission = perms[0];
+		this.groupPermission = perms[1];
+		this.globalPermission = perms[2];
+		this.owner = owner;
+		this.group = group;
+		this.set_hash(Sha1Generator.generate_Sha1(this.name));
+		this.lastupdate = new Date();
+	}
+	
 	public String getName() {
 		return this.name;
 	}
