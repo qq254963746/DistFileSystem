@@ -7,7 +7,6 @@ public class Client {
 	
 	private final TaskManager tm = new TaskManager();
 	
-	private int id;
 	private int servId;
     private String servIp;
     private String[] predecessor;

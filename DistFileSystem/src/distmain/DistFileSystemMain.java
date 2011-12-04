@@ -5,14 +5,21 @@
 
 package distmain;
 
+import java.awt.FileDialog;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
 import distclient.*;
 import distconfig.Constants;
+import distconfig.DistConfig;
 import distconfig.Sha1Generator;
+import distfilelisting.FileObject;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 import distserver.Server;
@@ -29,6 +36,7 @@ public class DistFileSystemMain {
 	
 	private String ipAddress = null;
 	private Thread thServ = null;
+	private DistConfig dcf = DistConfig.get_Instance();
 	
 	public DistFileSystemMain () {
 		try {
@@ -216,64 +224,100 @@ public class DistFileSystemMain {
 	public void run_interface() {
 		String input;
 		boolean exit = false;
+		String userName = this.userManage.get_ownUserName();
+		Pattern p = Pattern.compile("[\\s]+");
+		JFrame frame = new JFrame();
+		//frame.setVisible(true);
+		
+		String name;
+		String perms;
+		String group;
+		String fileName;
+		
 		while (!exit) {
 			try {
-				System.out.printf(this.prompt, this.userManage.get_ownUserName());
-				input = inStream.readLine().toLowerCase().trim();
-				/*String[] instr = input.split(" ",2);
-				String path;
+				System.out.printf(this.prompt, userName);
+				input = inStream.readLine().trim();
+		        String[] instr = p.split(input);
 				
-				switch (instr[0]) {
+				switch (instr[0].toLowerCase()) {
+				case "quit":
+					return;
 				
+				case "help":
+					System.out.println("Possible commands include 'quit', 'write', 'read', and 'rm'.");
+					System.out.println("write [filepermissions] [group]");
+					System.out.println("read [filename]");
+					System.out.println("rm [filename]");
+					break;
+					
 				case "write":
 					
-					if (instr.length > 1) {
-						path = instr[1].split(" ",1)[0].trim();
+					if (instr.length != 3 ) {throw new InvalidInputException();}
+					perms = instr[1];
+					group = instr[2];
 						
-						if (canWrite(path)) {
-							//TODO
-						} else {
-							System.out.println("Can not write to \"" + path + "\".");
-						}
-						
+					FileDialog fd = new FileDialog(frame, "Select a file to write", FileDialog.LOAD);
+					System.out.println(dcf.get_rootPath());
+					fd.setDirectory(dcf.get_rootPath());
+					fd.setVisible(true);
+					
+					fileName = fd.getFile();
+					if (fileName == null) { throw new UserCancelException();}
+					
+					File f = new File(fd.getFile());
+					name = f.getName();
+					FileObject fo = new FileObject(name, perms, userName, group);
+					
+					ClntUploadFile cuf = new ClntUploadFile(cli, fo, f, userName);
+					
+					cuf.run();
+					if (cuf.isSuccess()){
+						System.out.println("Write success.");
+					} else {
+						System.out.println("Can not write to \"" + name + "\".");
 					}
 					
 					break;
 				
 				case "read":
 					
-					if (instr.length > 1) {
-						path = instr[1].split(" ",1)[0].trim();
-						
-						if (canRead(path) && exists(path)) {
-							//TODO
-						} else {
-							System.out.println("Can not read from \"" + path + "\" or it does not exist.");
-						}
-						
+					if (instr.length != 2 ) {throw new InvalidInputException();}
+					
+					name = instr[1];
+					
+					ClntGetFile cgf = new ClntGetFile(ipAddress, cli, name, userName);
+					
+					cgf.run();
+					if (cgf.isSuccess()){
+						System.out.println("Write success.");
+					} else {
+						System.out.println("Can not read from \"" + name + "\".");
 					}
 					
 					break;
 
 				case "rm":
-					if (instr.length > 1) {
-						path = instr[1].split(" ",1)[0].trim();
-						
-						if (canWrite(path) && exists(path)) {
-							//TODO
-						} else {
-							System.out.println("Can not remove \"" + path + "\" or it does not exist.");
-						}
-						
+					
+					if (instr.length != 2 ) {throw new InvalidInputException();}
+					
+					name = instr[1];
+					
+					ClntRemoveFile crf = new ClntRemoveFile(ipAddress, cli, name, userName);
+					
+					crf.run();
+					if (crf.isSuccess()){
+						System.out.println("Write success.");
+					} else {
+						System.out.println("Can not remove \"" + name + "\".");
 					}
 					
 					break;
 					
 				default:
-					System.out.println("Unrecognized command: \""+ instr[0] + "\".");
+					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
 					break;
-				}*/
-				
+				}
 				
 				if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
@@ -303,7 +347,10 @@ public class DistFileSystemMain {
 			
 			catch (IOException e) {
 				e.printStackTrace();
-			}
+			} catch (InvalidInputException e) {
+				System.out.println("Invalid parameters specified. Please type 'help' for command instructions. ");
+			} catch (UserCancelException e) {System.out.println("User canceled");}
+			
 		}
 	}
 	
@@ -311,21 +358,7 @@ public class DistFileSystemMain {
 		new DistFileSystemMain();
 	}
 	
-	public boolean exists(String path) {
-		// TODO
-		
-		return true;
-	}
-	
-	public boolean canWrite(String path) {
-		
-		// TODO
-		return true;
-	}
-	
-	public boolean canRead(String path) {
-		// TODO
-		return true;
-	}
+	private class InvalidInputException extends Exception {private static final long serialVersionUID = 1L;};
+	private class UserCancelException extends Exception {private static final long serialVersionUID = 1L;};
 }
 

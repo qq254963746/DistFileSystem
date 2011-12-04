@@ -40,7 +40,6 @@ public class DistFileSystemTest {
 							new FileNotFoundException(pathToFile);
 					throw fnfe;
 				}
-				fi = null;
 				int lastSlash = pathToFile.lastIndexOf(System.getProperty("file.separator"));
 				String filename = pathToFile.substring(lastSlash+1);
 				
@@ -51,7 +50,7 @@ public class DistFileSystemTest {
 						this.userManage.get_ownUserName(), this.userManage.get_ownUserName());
 				
 				Client cli = new Client();
-				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, pathToFile, this.userManage.get_ownUserName());
+				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, fi, this.userManage.get_ownUserName());
 				cli.addTask(cuf);	
 			}
 			

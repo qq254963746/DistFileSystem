@@ -19,15 +19,13 @@ import distnodelisting.NodeSearchTable;
 
 public class ClntNewSuccessor implements Runnable {
 	private String host;
-	private Client client;
 	
 	public ClntNewSuccessor(Client client){
-		this(client.getSuccessor()[Constants.IP_ADDRESS], client);
+		this(client.getSuccessor()[Constants.IP_ADDRESS]);
 	}
 	
-	public ClntNewSuccessor(String host, Client client){
+	public ClntNewSuccessor(String host){
 		this.host = host;
-		this.client = client;
 	}
 
 	@Override

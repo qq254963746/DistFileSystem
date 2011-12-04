@@ -4,9 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 
 import distconfig.ConnectionCodes;
@@ -58,9 +56,6 @@ public class ClntCheckPosition implements Runnable {
 	        System.out.println("Sending Code");
 	        outStream.println(ConnectionCodes.CHECKPOSITION);
 	        outStream.flush();
-	        
-	        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-	        System.out.println("Got Object InputStream");
 	        
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
