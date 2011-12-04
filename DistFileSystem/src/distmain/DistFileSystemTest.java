@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import distclient.Client;
+import distclient.ClntGetFile;
 import distclient.ClntUploadFile;
 import distfilelisting.FileObject;
+import distfilelisting.LocalPathList;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 
@@ -50,9 +52,27 @@ public class DistFileSystemTest {
 				
 				Client cli = new Client();
 				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, pathToFile, this.userManage.get_ownUserName());
-				//cli.addTask(cuf);
-				cuf.run();
+				cli.addTask(cuf);	
+			}
+			
+			else if (command.contains("view files")) {
+				LocalPathList lpl = LocalPathList.get_Instance();
+				System.out.printf("Number of Files : %d\n", lpl.size());
+				for (int index = 0; index < lpl.size(); index++) {
+					System.out.printf("File Number: %s\tFile Name: %s\n", index, lpl.get(index).getName());
+				}
+			}
+			
+			else if (command.contains("get file")) {
+				System.out.printf("File Name: ");
+				String fileName = inStream.readLine();
+				System.out.printf("Path to Place: ");
+				String pathToPlace = inStream.readLine();
 				
+				Client cli = new Client();
+				
+				ClntGetFile cgf = new ClntGetFile (cli, fileName, pathToPlace, this.userManage.get_ownUserName());
+				cgf.run();
 			}
 		}
 		catch (FileNotFoundException e) {

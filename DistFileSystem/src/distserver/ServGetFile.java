@@ -167,6 +167,10 @@ class ServGetFile implements Runnable {
 	                    	outStream.println(ConnectionCodes.AUTHORIZED);
 	                    	outStream.flush();
 	                    	
+	                    	// send the fileobj
+	                    	oos.writeObject(fileobj);
+	                    	oos.flush();
+	                    	
 	                    	// Get the file input stream
 	                        FileInputStream fis = new FileInputStream(toTransfer);
 	                        byte[] buffer = new byte[distConfig.getBufferSize()];
@@ -189,31 +193,32 @@ class ServGetFile implements Runnable {
             
             // else locate next server to check
             else {
-            	int nextCheckID = Integer.parseInt(nst.get_IDAt(0));
-            	String nextCheckIP = nst.get_IPAt(0);
+            	
+            	int prevID = Integer.parseInt(nst.get_ownID());
+            	String prevIP = nst.get_ownIPAddress();
+            	
+            	String nextCheckIP = prevIP;
             	// For each element in the node search table
-            	for (int index = 0; index < nst.size()-1; index++) {
+            	for (int index = 0; index < nst.size(); index++) {
             		// Get the next two IDs
             		int nextID = Integer.parseInt(nst.get_IDAt(index));
-            		int secondID = Integer.parseInt(nst.get_IDAt(index + 1));
             		
             		// Check if the file hash lies between the two elements of the search table
             		// or if it is equal to one of them
-            		if (NodeSearchTable.is_between(fileHash, nextID, secondID) || 
-            				fileHash == nextID) {
-            			nextCheckID = nextID;
-            			nextCheckIP = nst.get_IPAt(index);
-            			continue;
+            		if (NodeSearchTable.is_between(fileHash, prevID, nextID) || 
+            				fileHash == prevID) {
+            			nextCheckIP = prevIP;
+            			break;
             		}
             		
             		// If it wasn't between, set the next check ID to the second ID
-        			nextCheckID = secondID;
-        			nextCheckIP = nst.get_IPAt(index + 1);
+            		prevID = nextID;
+            		prevIP = nst.get_IPAt(index);
+        			nextCheckIP = prevIP;
             	}
             	
             	// Send the next location to look
             	outStream.println(ConnectionCodes.WRONGPOSITION);
-            	outStream.println(Integer.toString(nextCheckID));
             	outStream.println(nextCheckIP);
             	outStream.flush();
             	

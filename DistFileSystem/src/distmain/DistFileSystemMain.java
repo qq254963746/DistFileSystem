@@ -89,6 +89,72 @@ public class DistFileSystemMain {
 		}
 	}
 	
+	
+	public DistFileSystemMain (boolean gratus) {
+		try {
+			inStream = new BufferedReader(new InputStreamReader(System.in));
+			userManage = UserManagement.get_Instance();
+			nst = NodeSearchTable.get_Instance();
+			
+			System.out.print("Please input your username: ");
+			String userName = "";
+			do {
+				userName = inStream.readLine().trim();
+				if (userName.equals("")) {
+					System.out.print("Username must contain non-whitespace characters. Please try again: ");
+				}
+				
+			} while (userName.equals(""));
+			
+			userManage.set_ownUserName(userName);
+			
+			
+			System.out.print("Would you like to [s]tart a network or [j]oin one that already exists?\n(s/j): ");
+			String response = "";
+			do {
+				response = inStream.readLine().trim().toUpperCase();
+				if (!(response.equals("S") || response.equals("J"))) {
+					System.out.print("Invalid input received. Try again.\n(s/j): ");
+				}
+			} while (!(response.equals("S") || response.equals("J")));
+			
+			ipAddress = "";
+			InetAddressValidator validator = InetAddressValidator.getInstance();
+
+			System.out.print("Enter IP: ");
+			ipAddress = inStream.readLine();
+			
+			if (!ipAddress.trim().equals("")) {
+				this.connect_to_network();
+			}
+
+			this.start_server();
+			/*switch (response) {
+				case "J":
+					System.out.print("Please input the IP address of the network you would like to join: ");
+					do {
+						ipAddress = inStream.readLine().trim();
+						if (!validator.isValidInet4Address(ipAddress)){
+							System.out.print("Invalid IPv4 address received. Try again: ");
+						}
+					} while (!validator.isValidInet4Address(ipAddress));
+
+					break;
+					
+				case "S":
+				default:
+					this.connect_to_network();
+				
+			}*/
+
+			this.run_interface();
+			
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void start_server() {
 		System.out.println("Starting Server");
 		Server serv = new Server();
@@ -154,7 +220,7 @@ public class DistFileSystemMain {
 			try {
 				System.out.printf(this.prompt, this.userManage.get_ownUserName());
 				input = inStream.readLine().toLowerCase().trim();
-				String[] instr = input.split(" ",2);
+				/*String[] instr = input.split(" ",2);
 				String path;
 				
 				switch (instr[0]) {
@@ -206,7 +272,7 @@ public class DistFileSystemMain {
 				default:
 					System.out.println("Unrecognized command: \""+ instr[0] + "\".");
 					break;
-				}
+				}*/
 				
 				
 				if (input.equals("view predecessor")) {

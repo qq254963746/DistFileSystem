@@ -11,7 +11,9 @@ import java.net.Socket;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
+import distconfig.Sha1Generator;
 import distfilelisting.FileObject;
+import distnodelisting.NodeSearchTable;
 
 public class ClntGetFile implements Runnable {
 	private String host;
@@ -19,6 +21,8 @@ public class ClntGetFile implements Runnable {
 	private FileObject file;
 	private boolean backup;
 	private String username;
+	private String filename;
+	private String wheretoput;
 
 	public ClntGetFile(String host, Client client, FileObject file, String username){
 		this.host = host;
@@ -34,6 +38,40 @@ public class ClntGetFile implements Runnable {
 		this.file = file;
 		this.backup = backup;
 		this.username = username;
+	}
+	
+	private ClntGetFile (String host, Client client, String filename, String wheretoput, String username, boolean backup) {
+		this.host = host;
+		this.client = client;
+		this.filename = filename;
+		this.backup = backup;
+		this.username = username;
+		this.wheretoput = wheretoput;
+	}
+	
+	public ClntGetFile (Client client, String filename, String wheretoput, String username) {
+		this.client = client;
+		this.backup = false;
+		this.username = username;
+		this.filename = filename;
+		this.wheretoput = wheretoput;
+		
+		int hash = Sha1Generator.generate_Sha1(this.filename);
+		
+		NodeSearchTable nst = NodeSearchTable.get_Instance();
+		this.host = null;
+		for (int index = 0; index < nst.size()-1; index++) {
+			if (NodeSearchTable.is_between(
+					hash,
+					Integer.parseInt(nst.get_IDAt(index)), 
+					Integer.parseInt(nst.get_IDAt(index + 1)))) {
+				this.host = nst.get_IPAt(index);
+				break;
+			}
+			else {
+				this.host = nst.get_IPAt(index+1);
+			}
+		}
 	}
 
 	@Override
@@ -71,8 +109,8 @@ public class ClntGetFile implements Runnable {
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
-	        System.out.println("Sending filename as " + this.file.getName());
-	        outStream.println(this.file.getName());
+	        System.out.println("Sending filename as " + this.filename);
+	        outStream.println(this.filename);
 	        outStream.flush();
 	        
 	        String back = this.backup ? "1" : "0";
@@ -83,11 +121,11 @@ public class ClntGetFile implements Runnable {
 	        String response = in.readLine();
 	        System.out.println("Received " + response);
 	        
-	        if (response.equals(ConnectionCodes.CORRECTPOSITION)) {
+	        if (Integer.parseInt(response) == ConnectionCodes.CORRECTPOSITION) {
 	        	response = in.readLine();
 		        System.out.println("Received " + response);
 		        
-		        if (response.equals(ConnectionCodes.FILEEXISTS)) {
+		        if (Integer.parseInt(response) == ConnectionCodes.FILEEXISTS) {
 		        	System.out.println("Sending username as " + username);
 			        outStream.println(username);
 			        outStream.flush();
@@ -95,8 +133,11 @@ public class ClntGetFile implements Runnable {
 			        response = in.readLine();
 			        System.out.println("Received " + response);
 			        
-			        if (response.equals(ConnectionCodes.AUTHORIZED)) {
-			        	FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + file.getName());
+			        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
+			        	FileObject getingfile = (FileObject)ois.readObject();
+			        	
+			        	//FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + this.filename);
+			        	FileOutputStream fos = new FileOutputStream (this.wheretoput + System.getProperty("file.separator"));
 	            		
 	            		// Upload the file
 			        	int bytesRead = 0;
@@ -112,20 +153,21 @@ public class ClntGetFile implements Runnable {
 			        	System.out.println("Sending confirm");
 			        	outStream.println(ConnectionCodes.GETFILE);
 			        	
-			        } else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
+			        }
+			        else if (Integer.parseInt(response) == ConnectionCodes.NOTAUTHORIZED) {
 			        	return;
 			        }
 		        	
-		        } else if (response.equals(ConnectionCodes.FILEDOESNTEXIST)) {
-		        	response = in.readLine();
-			        System.out.println("Received backup IP: " + response);
-			        
-			        if (this.backup){
+		        }
+		        else if (Integer.parseInt(response) == ConnectionCodes.FILEDOESNTEXIST) {
+			        if (!this.backup){
 			        	response = in.readLine();
 				        System.out.println("Received backup IP: " + response);
 				        
 				        sock.close();
-				        client.addTask(new ClntGetFile(response, this.client, this.file, this.username, true));
+				        //client.addTask(new ClntGetFile(response, this.client, this.file, this.username, true));
+				        ClntGetFile cgf = new ClntGetFile (response, this.client, this.filename, this.wheretoput, this.username, true);
+				        cgf.run();
 			        	
 			        } else {
 			        	response = in.readLine();
@@ -139,12 +181,15 @@ public class ClntGetFile implements Runnable {
 		        	return;
 		        }
 	        	
-	        } else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
+	        }
+	        else if (Integer.parseInt(response) == ConnectionCodes.WRONGPOSITION) {
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
 		        sock.close();
-		        client.addTask(new ClntGetFile(nextHost, this.client, this.file, this.username));
+		        //client.addTask(new ClntGetFile(nextHost, this.client, this.file, this.username));
+		        ClntGetFile cgf = new ClntGetFile (nextHost, this.client, this.filename, this.wheretoput, this.username, false);
+		        cgf.run();
 		        return;
 	        	
 	        }
