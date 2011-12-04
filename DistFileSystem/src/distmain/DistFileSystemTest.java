@@ -49,7 +49,7 @@ public class DistFileSystemTest {
 						this.userManage.get_ownUserName(), this.userManage.get_ownUserName());
 				
 				Client cli = new Client();
-				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, pathToFile, this.userManage.get_ownUserName());
+				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, fi, this.userManage.get_ownUserName());
 				//cli.addTask(cuf);
 				cuf.run();
 				

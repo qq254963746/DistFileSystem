@@ -4,33 +4,32 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
-import distfilelisting.FileObject;
 
 public class ClntRemoveFile implements Runnable {
 	private String host;
 	private Client client;
-	private FileObject file;
+	private String fileName;
 	private boolean backup;
 	private String username;
+	private boolean success = false; 
 
-	public ClntRemoveFile(String host, Client client, FileObject file, String username){
+	public ClntRemoveFile(String host, Client client, String fileName, String username){
 		this.host = host;
 		this.client = client;
-		this.file = file;
+		this.fileName = fileName;
 		this.backup = false;
 		this.username = username;
 	}
 	
-	private ClntRemoveFile(String host, Client client, FileObject file, String username, boolean backup) {
+	private ClntRemoveFile(String host, Client client, String fileName, String username, boolean backup) {
 		this.host = host;
 		this.client = client;
-		this.file = file;
+		this.fileName = fileName;
 		this.backup = backup;
 		this.username = username;
 	}
@@ -57,10 +56,6 @@ public class ClntRemoveFile implements Runnable {
 	                    new InputStreamReader (
 	                            sock.getInputStream()));
 	        System.out.println("Got InputStream");
-	        
-            // Create object input stream
-            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-	        
 	
 	        
 	        System.out.println("Sending Code");
@@ -70,8 +65,8 @@ public class ClntRemoveFile implements Runnable {
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
 	        
-	        System.out.println("Sending filename as " + this.file.getName());
-	        outStream.println(this.file.getName());
+	        System.out.println("Sending filename as " + fileName);
+	        outStream.println(fileName);
 	        outStream.flush();
 	        
 	        String back = this.backup ? "1" : "0";
@@ -94,6 +89,8 @@ public class ClntRemoveFile implements Runnable {
 			        response = in.readLine();
 			        System.out.println("Received " + response);
 			        
+			        success = true;
+			        
 			        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
 			        	
 			        } else if (Integer.parseInt(response) == ConnectionCodes.NOTAUTHORIZED) {
@@ -109,7 +106,9 @@ public class ClntRemoveFile implements Runnable {
 				        System.out.println("Received backup IP: " + response);
 				        
 				        sock.close();
-				        client.addTask(new ClntRemoveFile(response, this.client, this.file, this.username, true));
+				        ClntRemoveFile crf = new ClntRemoveFile(response, this.client, this.fileName, this.username, true);
+				        crf.run();
+				        success = crf.isSuccess();
 			        	
 			        } else {
 			        	response = in.readLine();
@@ -124,7 +123,7 @@ public class ClntRemoveFile implements Runnable {
 		        System.out.println("Received next Server IP: " + nextHost);
 		        
 		        sock.close();
-		        client.addTask(new ClntRemoveFile(nextHost, this.client, this.file, this.username));
+		        client.addTask(new ClntRemoveFile(nextHost, this.client, this.fileName, this.username));
 	        	
 	        }
 	        
@@ -136,5 +135,7 @@ public class ClntRemoveFile implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public boolean isSuccess() { return success; }
 
 }

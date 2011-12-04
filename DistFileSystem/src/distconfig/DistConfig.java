@@ -34,7 +34,7 @@ public class DistConfig implements Serializable {
     private DistConfig() {
     	this.rootpath = System.getProperty("user.dir");
     	
-    	File home = new File(this.rootpath + "/home");
+    	File home = new File(this.rootpath + System.getProperty("file.separator") + "home");
     	if (!home.exists()) {
 			boolean success = home.mkdir();
 			if (!success) {
@@ -42,7 +42,7 @@ public class DistConfig implements Serializable {
 			}
     	}
     	
-    	this.rootpath = this.rootpath + "/home";
+    	this.rootpath = this.rootpath +  System.getProperty("file.separator") + "home";
     	
     	this.CURRNODES = 1;
     }

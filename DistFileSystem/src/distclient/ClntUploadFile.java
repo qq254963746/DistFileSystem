@@ -4,12 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
@@ -24,21 +21,21 @@ public class ClntUploadFile implements Runnable {
 	private Client client;
 	private FileObject file;
 	private String username;
-	private String fullpath;
+	private File toUpload;
+	private boolean success = false;
 
-	public ClntUploadFile(String host, Client client, FileObject file, String username){
-		DistConfig distConfig = DistConfig.get_Instance();
+	public ClntUploadFile(String host, Client client, FileObject file, File toUpload, String username){
 		this.host = host;
 		this.client = client;
 		this.file = file;
-		this.fullpath = distConfig.get_rootPath() + System.getProperty("file.separator") + file.getName();
+		this.toUpload = toUpload;
 		this.username = username;
 	}
 	
-	public ClntUploadFile (Client client, FileObject file, String fullPath, String username) {
+	public ClntUploadFile (Client client, FileObject file, File toUpload, String username) {
 		this.client = client;
 		this.file = file;
-		this.fullpath = fullPath;
+		this.toUpload = toUpload;
 		this.username = username;
 		
 		// Get the first host to check
@@ -56,14 +53,6 @@ public class ClntUploadFile implements Runnable {
 				this.host = nst.get_IPAt(index+1);
 			}
 		}
-	}
-	
-	public ClntUploadFile (String host, Client client, FileObject file, String fullPath, String username) {
-		this.client = client;
-		this.file = file;
-		this.fullpath = fullPath;
-		this.username = username;
-		this.host = host;
 	}
 
 
@@ -120,10 +109,8 @@ public class ClntUploadFile implements Runnable {
 		        
 		        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
 
-		        	//String fullPathName = distConfig.get_rootPath() + this.file.getName();
-		        	String fullPathName = this.fullpath;
-		        	
-		        	File toTransfer = new File (fullPathName);
+		        	//String fullPathName = distConfig.get_rootPath() + this.file.getName();		        	
+		        	File toTransfer = toUpload;
 		        	
                     FileInputStream fis = new FileInputStream(toTransfer);
                     byte[] buffer = new byte[distConfig.getBufferSize()];
@@ -138,6 +125,7 @@ public class ClntUploadFile implements Runnable {
 		        	
 		        	System.out.println("Received " + in.readLine());
 		        	sock.close();
+		        	success = true;
 		        	return;
 			        	
 			    } 
@@ -156,8 +144,9 @@ public class ClntUploadFile implements Runnable {
 		        
 		        sock.close();
 		        //client.addTask(new ClntUploadFile(nextHost, this.client, this.file, this.username));
-		        ClntUploadFile cuf = new ClntUploadFile (nextHost, this.client, this.file, this.fullpath, this.username);
+		        ClntUploadFile cuf = new ClntUploadFile (nextHost, this.client, this.file, this.toUpload, this.username);
 		        cuf.run();
+		        success = cuf.isSuccess(); 
 		        return;
 	        	
 	        }
@@ -170,5 +159,7 @@ public class ClntUploadFile implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public boolean isSuccess(){ return success; }
 
 }
