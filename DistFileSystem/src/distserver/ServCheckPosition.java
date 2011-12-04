@@ -11,7 +11,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -56,9 +55,6 @@ public class ServCheckPosition implements Runnable {
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
             System.out.println("Got the out stream");
-            // Setup the object writer to the client
-            ObjectOutputStream oos = new ObjectOutputStream (bos);
-            System.out.println("Got the object output stream");
             
             // Send an acknowledgment that the server is connected
             // for checking the position
@@ -166,7 +162,6 @@ public class ServCheckPosition implements Runnable {
                 outStream.flush();
             }
             
-            oos.close();
             outStream.close();
             bos.close();
             inStream.close();

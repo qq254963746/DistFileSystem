@@ -21,7 +21,6 @@ public class ClntGetFile implements Runnable {
 	private String fileName;
 	private boolean backup;
 	private String username;
-	private String filename;
 	private String wheretoput;
 	private boolean success = false;
 
@@ -44,7 +43,7 @@ public class ClntGetFile implements Runnable {
 	private ClntGetFile (String host, Client client, String filename, String wheretoput, String username, boolean backup) {
 		this.host = host;
 		this.client = client;
-		this.filename = filename;
+		this.fileName = filename;
 		this.backup = backup;
 		this.username = username;
 		this.wheretoput = wheretoput;
@@ -54,10 +53,10 @@ public class ClntGetFile implements Runnable {
 		this.client = client;
 		this.backup = false;
 		this.username = username;
-		this.filename = filename;
+		this.fileName = filename;
 		this.wheretoput = wheretoput;
 		
-		int hash = Sha1Generator.generate_Sha1(this.filename);
+		int hash = Sha1Generator.generate_Sha1(this.fileName);
 		
 		NodeSearchTable nst = NodeSearchTable.get_Instance();
 		this.host = null;
@@ -96,16 +95,13 @@ public class ClntGetFile implements Runnable {
 	        BufferedReader in = new BufferedReader (
 	                    new InputStreamReader (
 	                            sock.getInputStream()));
-	        System.out.println("Got InputStream");
-	        
-            // Create object input stream
-            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-	        
-	
+	        System.out.println("Got InputStream");	        
 	        
 	        System.out.println("Sending Code");
 	        outStream.println(ConnectionCodes.GETFILE);
 	        outStream.flush();
+	        
+            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
 	        
 	        System.out.println("Getting Ack");
 	        System.out.println(in.readLine());
@@ -136,6 +132,7 @@ public class ClntGetFile implements Runnable {
 			        
 			        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
 			        	FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + fileName);
+			        	FileObject nfo = (FileObject)ois.readObject();
 	            		
 	            		// Download
 			        	int bytesRead = 0;
@@ -157,11 +154,8 @@ public class ClntGetFile implements Runnable {
 			        }
 		        	
 
-		        } else if (Integer.parseInt(response) == ConnectionCodes.FILEDOESNTEXIST) {
-		        	response = in.readLine();
-			        System.out.println("Received backup IP: " + response);
-			        
-			        if (this.backup){
+		        } else if (Integer.parseInt(response) == ConnectionCodes.FILEDOESNTEXIST) {			        
+			        if (!this.backup){
 			        	response = in.readLine();
 				        System.out.println("Received backup IP: " + response);
 				        
@@ -177,7 +171,7 @@ public class ClntGetFile implements Runnable {
 			        }
 		        }
 	        	
-	        } else if (Integer.parseInt(response) ==ConnectionCodes.WRONGPOSITION) {
+	        } else if (Integer.parseInt(response) == ConnectionCodes.WRONGPOSITION) {
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        

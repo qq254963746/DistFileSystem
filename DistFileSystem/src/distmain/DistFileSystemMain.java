@@ -56,7 +56,7 @@ public class DistFileSystemMain {
 			
 			userManage.set_ownUserName(userName);
 			
-			
+			/*
 			System.out.print("Would you like to [s]tart a network or [j]oin one that already exists?\n(s/j): ");
 			String response = "";
 			do {
@@ -87,8 +87,15 @@ public class DistFileSystemMain {
 				default:
 					this.connect_to_network();
 				
-			}
+			}*/
 
+			System.out.print("Enter IP: ");
+			ipAddress = inStream.readLine().trim();
+			this.start_server();
+
+			if (!ipAddress.equals("")) 
+				this.connect_to_network();
+			
 			this.run_interface();
 			
 		} 
@@ -239,7 +246,7 @@ public class DistFileSystemMain {
 				System.out.printf(this.prompt, userName);
 				input = inStream.readLine().trim();
 		        String[] instr = p.split(input);
-				
+				/*
 				switch (instr[0].toLowerCase()) {
 				case "quit":
 					return;
@@ -318,7 +325,7 @@ public class DistFileSystemMain {
 					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
 					break;
 				}
-				
+				*/
 				if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
 					System.out.printf("Predecessor IP = %s\n", this.nst.get_predecessorIPAddress());
@@ -347,9 +354,9 @@ public class DistFileSystemMain {
 			
 			catch (IOException e) {
 				e.printStackTrace();
-			} catch (InvalidInputException e) {
-				System.out.println("Invalid parameters specified. Please type 'help' for command instructions. ");
-			} catch (UserCancelException e) {System.out.println("User canceled");}
+			}// catch (InvalidInputException e) {
+				//System.out.println("Invalid parameters specified. Please type 'help' for command instructions. ");
+			//} catch (UserCancelException e) {System.out.println("User canceled");}
 			
 		}
 	}

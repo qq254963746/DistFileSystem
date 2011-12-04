@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import distclient.Client;
 import distclient.ClntGetFile;
@@ -51,7 +54,8 @@ public class DistFileSystemTest {
 				
 				Client cli = new Client();
 				ClntUploadFile cuf = new ClntUploadFile (cli, nfo, fi, this.userManage.get_ownUserName());
-				cli.addTask(cuf);	
+				cuf.run();
+				//cli.addTask(cuf);	
 			}
 			
 			else if (command.contains("view files")) {
@@ -62,7 +66,21 @@ public class DistFileSystemTest {
 				}
 			}
 			
-			else if (command.contains("get file")) {
+			else if (command.contains("view users")) {
+				UserManagement um = UserManagement.get_Instance();
+				Hashtable<String, Vector<String>> users = um.get_usernames();
+				Enumeration<String> keys = users.keys();
+				while (keys.hasMoreElements()) {
+					String key = keys.nextElement();
+					System.out.printf("%s: ", key);
+					for (String elm : users.get(key)) {
+						System.out.printf("%s, ", elm);
+					}
+					System.out.print("\n");
+				}
+			}
+			
+			else if (command.contains("getfile")) {
 				System.out.printf("File Name: ");
 				String fileName = inStream.readLine();
 				System.out.printf("Path to Place: ");

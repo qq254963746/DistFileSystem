@@ -4,6 +4,7 @@
 package distfilelisting;
 
 import java.io.Serializable;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -45,7 +46,9 @@ public class UserManagement implements Serializable {
 	}
 	
 	public static UserManagement set_Instance(UserManagement userManage) {
+		String curruser = instance.get_ownUserName();
 		instance = userManage;
+		instance.set_ownUserName(curruser);
 		return instance;
 		
 	}
@@ -72,6 +75,27 @@ public class UserManagement implements Serializable {
 		else {
 			return false;
 		}
+	}
+	
+	public boolean auth_User (String userName, String passHash, FileObject fo) {
+		
+		if (!auth_User (userName, passHash))
+			return false;
+		
+		if (userName.equals(fo.getOwner())) {
+			return true;
+		}
+		
+		Vector<String> groups = this.globalUserGroups.get(userName);
+		if (groups.contains(fo.getGroup())) {
+			if (fo.getGroupPermision() >= 4)
+				return true;
+		}
+		
+		if (fo.getGlobalPermission() >= 4)
+			return true;
+		
+		return false;
 	}
 	
 	public boolean is_UserInGroup (String userName, String group) {
@@ -210,4 +234,16 @@ public class UserManagement implements Serializable {
     	
     	return retval;
     }
+	
+	public Hashtable<String,Vector<String>> get_usernames () {
+		Hashtable<String,Vector<String>> users = new Hashtable<String,Vector<String>>();
+		
+		Enumeration<String> keys = this.globalUsers.keys();
+		while (keys.hasMoreElements()) {
+			String key = keys.nextElement();
+			Vector<String> groups = this.globalUserGroups.get(key);
+			users.put(key, groups);
+		}
+		return users;
+	}
 }

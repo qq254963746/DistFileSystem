@@ -22,6 +22,7 @@ public class TaskManager extends Thread {
 			while (true) {
 				while (taskQueue.isEmpty()){}
 				Runnable task = taskQueue.remove();
+				System.out.printf("running task: %s\n", task.toString());
 				task.run();
 			}
 		} catch (NoSuchElementException e)

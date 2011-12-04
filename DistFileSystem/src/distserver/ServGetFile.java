@@ -65,6 +65,7 @@ class ServGetFile implements Runnable {
             // Get file name and if this is the backup server
             String filename = inStream.readLine();
             is_backup = Integer.parseInt(inStream.readLine());
+            System.out.printf("is backup = %d\n", is_backup);
             
             // Get the hash for the file
             int fileHash = Sha1Generator.generate_Sha1(filename);
@@ -76,16 +77,20 @@ class ServGetFile implements Runnable {
             boolean is_correct = false;
             // If this is not the backup server, and the file lies between the previous node
             // and this one, or equal to this nodes ID, then this is correct
+            System.out.printf("file: %s\tpred: %s\tmine: %s\tnext: %s\n", fileHash,
+            		Integer.parseInt(nst.get_predecessorID()),
+            		Integer.parseInt(nst.get_ownID()),
+            		Integer.parseInt(nst.get_IDAt(0)));
             if (is_backup == 0 &&
-            		(NodeSearchTable.is_between(fileHash, Integer.parseInt(nst.get_predecessorIPAddress()), Integer.parseInt(nst.get_ownID())) ||
+            		(NodeSearchTable.is_between(fileHash, Integer.parseInt(nst.get_predecessorID()), Integer.parseInt(nst.get_ownID())) ||
             				fileHash == Integer.parseInt(nst.get_ownID()))) {
             	is_correct = true;
             }
             // If this is the backup server, and the file lies between this node and its successor
             // or is equal to the successors ID, then this is the correct node
-            else if (is_backup != 0 &&
-            		(NodeSearchTable.is_between(fileHash, Integer.parseInt(nst.get_ownID()), Integer.parseInt(nst.get_IDAt(0))) ||
-            				fileHash == Integer.parseInt(nst.get_IDAt(0)))) {
+            else if (is_backup != 0) { // &&
+            //		(NodeSearchTable.is_between(fileHash, Integer.parseInt(nst.get_ownID()), Integer.parseInt(nst.get_IDAt(0))) ||
+            //				fileHash == Integer.parseInt(nst.get_IDAt(0)))) {
             	is_correct = true;
             }
             
@@ -153,7 +158,7 @@ class ServGetFile implements Runnable {
 	                		}
 	                	}
 	                	// Does the global community have permissions
-	                	else if (fileobj.getGlobalPermission() > 4) {
+	                	else if (fileobj.getGlobalPermission() >= 4) {
 	                		isAllowedAccess = true;
 	                	}
 	                	
@@ -193,29 +198,29 @@ class ServGetFile implements Runnable {
             
             // else locate next server to check
             else {
-            	
             	int prevID = Integer.parseInt(nst.get_ownID());
-            	String prevIP = nst.get_ownIPAddress();
+            	String prevIP = nst.get_IPAt(0);
+            	int nextID = Integer.parseInt(nst.get_IDAt(0));
+            	String nextCheckIP = null;
             	
-            	String nextCheckIP = prevIP;
-            	// For each element in the node search table
-            	for (int index = 0; index < nst.size(); index++) {
-            		// Get the next two IDs
-            		int nextID = Integer.parseInt(nst.get_IDAt(index));
-            		
-            		// Check if the file hash lies between the two elements of the search table
-            		// or if it is equal to one of them
-            		if (NodeSearchTable.is_between(fileHash, prevID, nextID) || 
-            				fileHash == prevID) {
-            			nextCheckIP = prevIP;
-            			break;
-            		}
-            		
-            		// If it wasn't between, set the next check ID to the second ID
-            		prevID = nextID;
-            		prevIP = nst.get_IPAt(index);
-        			nextCheckIP = prevIP;
+            	if (NodeSearchTable.is_between(fileHash, prevID, nextID)) {
+            		nextCheckIP = nst.get_IPAt(0);
             	}
+            	else {
+            		prevID = nextID;
+            		for (int index = 1; index < nst.size(); index++) {
+            			nextID = Integer.parseInt(nst.get_IDAt(index));
+            			if (NodeSearchTable.is_between(fileHash, prevID, nextID) || 
+                				fileHash == prevID) {
+                			nextCheckIP = prevIP;
+                			break;
+                		}
+            			prevIP = nst.get_IPAt(index);
+            			prevID = nextID;
+            			nextCheckIP = prevIP;
+            		}
+            	}
+            	
             	
             	// Send the next location to look
             	outStream.println(ConnectionCodes.WRONGPOSITION);
