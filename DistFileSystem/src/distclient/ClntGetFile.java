@@ -83,11 +83,11 @@ public class ClntGetFile implements Runnable {
 	        String response = in.readLine();
 	        System.out.println("Received " + response);
 	        
-	        if (response.equals(ConnectionCodes.CORRECTPOSITION)) {
+	        if (Integer.parseInt(response) == ConnectionCodes.CORRECTPOSITION) {
 	        	response = in.readLine();
 		        System.out.println("Received " + response);
 		        
-		        if (response.equals(ConnectionCodes.FILEEXISTS)) {
+		        if (Integer.parseInt(response) == ConnectionCodes.FILEEXISTS) {
 		        	System.out.println("Sending username as " + username);
 			        outStream.println(username);
 			        outStream.flush();
@@ -95,7 +95,7 @@ public class ClntGetFile implements Runnable {
 			        response = in.readLine();
 			        System.out.println("Received " + response);
 			        
-			        if (response.equals(ConnectionCodes.AUTHORIZED)) {
+			        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
 			        	FileOutputStream fos = new FileOutputStream (distConfig.get_rootPath() + file.getName());
 	            		
 	            		// Upload the file
@@ -112,11 +112,11 @@ public class ClntGetFile implements Runnable {
 			        	System.out.println("Sending confirm");
 			        	outStream.println(ConnectionCodes.GETFILE);
 			        	
-			        } else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
+			        } else if (Integer.parseInt(response) == ConnectionCodes.NOTAUTHORIZED) {
 			        	return;
 			        }
 		        	
-		        } else if (response.equals(ConnectionCodes.FILEDOESNTEXIST)) {
+		        } else if (Integer.parseInt(response) == ConnectionCodes.FILEDOESNTEXIST) {
 		        	response = in.readLine();
 			        System.out.println("Received backup IP: " + response);
 			        
@@ -139,7 +139,7 @@ public class ClntGetFile implements Runnable {
 		        	return;
 		        }
 	        	
-	        } else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
+	        } else if (Integer.parseInt(response) ==ConnectionCodes.WRONGPOSITION) {
 		        String nextHost = in.readLine();
 		        System.out.println("Received next Server IP: " + nextHost);
 		        

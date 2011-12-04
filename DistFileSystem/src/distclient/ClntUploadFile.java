@@ -108,7 +108,6 @@ public class ClntUploadFile implements Runnable {
 	        System.out.println("Received " + response);
 	        
 	        if (Integer.parseInt(response) == ConnectionCodes.CORRECTPOSITION) {
-	        //if (response.equals(ConnectionCodes.CORRECTPOSITION)) {
 	        	System.out.println("Sending username as " + this.username);
 		        outStream.println(this.username);
 		        outStream.flush();
@@ -120,7 +119,6 @@ public class ClntUploadFile implements Runnable {
 		        System.out.println("Received " + response);
 		        
 		        if (Integer.parseInt(response) == ConnectionCodes.AUTHORIZED) {
-		        //if (response.equals(ConnectionCodes.AUTHORIZED)) {
 
 		        	//String fullPathName = distConfig.get_rootPath() + this.file.getName();
 		        	String fullPathName = this.fullpath;
@@ -144,14 +142,12 @@ public class ClntUploadFile implements Runnable {
 			        	
 			    } 
 		        else if (Integer.parseInt(response) == ConnectionCodes.NOTAUTHORIZED) {
-		        //else if (response.equals(ConnectionCodes.NOTAUTHORIZED)) {
 			    	sock.close();
 			    	return;
 			    }
 	        	
 	        } 
 	        else if (Integer.parseInt(response) == ConnectionCodes.WRONGPOSITION) {
-	        //else if (response.equals(ConnectionCodes.WRONGPOSITION)) {
 	        	int nextId = Integer.parseInt(in.readLine());
 		        System.out.println("Received next ID: " + nextId);
 		        
