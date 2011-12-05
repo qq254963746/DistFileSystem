@@ -37,6 +37,10 @@ public class ServHeartBeat implements Runnable {
 	private DistConfig distConfig = null;
 	private NodeSearchTable nst = null;
 	private LocalPathList lpl = null;
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	private BufferedReader inStream;
+	private PrintWriter outStream;
 	
 	/**
 	 * 
@@ -46,6 +50,61 @@ public class ServHeartBeat implements Runnable {
 	public ServHeartBeat (Socket cli, boolean is_server) {
 		this.client = cli;
 		this.is_serv = is_server;
+		
+		try {
+			if (is_serv) {
+				// Get the input stream for the client
+		        inStream = new BufferedReader (
+		                new InputStreamReader(client.getInputStream()));
+		        System.out.println("got instream in hb serv");
+		        // Get the output stream for the client
+		        BufferedOutputStream bos = new BufferedOutputStream (
+		                client.getOutputStream());
+		        // Setup the writer to the client
+		        outStream = new PrintWriter(bos, false);
+		        System.out.println("got outstream in hb serv");
+	        
+		        // Setup the object writer to the client
+		        oos = new ObjectOutputStream (bos);
+		        System.out.println("got oos in hb serv");
+	
+		        // Send acknowledgment
+		        System.out.println("Sending ack in hb serv");
+		        outStream.println(ConnectionCodes.HEARTBEAT);
+		        outStream.flush();
+		        
+		        // Setup the object input stream
+		        ois = new ObjectInputStream (client.getInputStream());
+		        System.out.println("got ois in hb serv");
+			}
+			else {
+				// Get the input stream for the server
+		        inStream = new BufferedReader (
+		                new InputStreamReader(client.getInputStream()));
+		        System.out.println("Got instream in hb client");
+		        // Get the output stream for the server
+		        BufferedOutputStream bos = new BufferedOutputStream (
+		                client.getOutputStream());
+		        // Setup the writer to the server
+		        outStream = new PrintWriter(bos, false);
+		        System.out.println("got outstream in hb client");
+
+		        // Setup the object input stream
+		        ois = new ObjectInputStream (client.getInputStream());
+		        System.out.println("got ois in hb client");
+				
+		        // Receive acknowledgment and send ID
+		        System.out.println("Getting ack in hb client");
+		        inStream.readLine();
+
+		        // Setup the object writer to the server
+		        oos = new ObjectOutputStream (bos);
+		        System.out.println("got oos in hb client");				
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -77,32 +136,9 @@ public class ServHeartBeat implements Runnable {
 		this.lpl = LocalPathList.get_Instance();
 		
 		try {
-			// Get the input stream for the client
-	        BufferedReader inStream = new BufferedReader (
-	                new InputStreamReader(client.getInputStream()));
-	        System.out.println("got instream in hb serv");
-	        // Get the output stream for the client
-	        BufferedOutputStream bos = new BufferedOutputStream (
-	                client.getOutputStream());
-	        // Setup the writer to the client
-	        PrintWriter outStream = new PrintWriter(bos, false);
-	        System.out.println("got outstream in hb serv");
-        
-	        // Setup the object writer to the client
-	        ObjectOutputStream oos = new ObjectOutputStream (bos);
-	        System.out.println("got oos in hb serv");
-
-	        // Send acknowledgment
-	        System.out.println("Sending ack in hb serv");
-	        outStream.println(ConnectionCodes.HEARTBEAT);
-	        outStream.flush();
-	        
-	        // Setup the object input stream
-	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
-	        System.out.println("got ois in hb serv");
 	        
 	        // Get ID of the connecting server
-	        System.out.println("Receiver ID of connecting serv in hb serv");
+	        System.out.println("Receiving ID of connecting serv in hb serv");
 	        int prevID = Integer.parseInt(inStream.readLine());
 	        
 	        Vector<FileObject> filestosend = new Vector<FileObject>();
@@ -152,12 +188,6 @@ public class ServHeartBeat implements Runnable {
 	        }
 	        
 	        System.out.println("Closing in hb serv");
-	        // Close all streams
-	        oos.close();
-	        outStream.close();
-	        bos.close();
-	        ois.close();
-	        inStream.close();
 		}
 		
 		catch (ClassNotFoundException ex) {
@@ -182,34 +212,6 @@ public class ServHeartBeat implements Runnable {
 		this.lpl = LocalPathList.get_Instance();
 		
 		try {
-			// Get the input stream for the server
-	        BufferedReader inStream = new BufferedReader (
-	                new InputStreamReader(client.getInputStream()));
-	        System.out.println("Got instream in hb client");
-	        // Get the output stream for the server
-	        BufferedOutputStream bos = new BufferedOutputStream (
-	                client.getOutputStream());
-	        // Setup the writer to the server
-	        PrintWriter outStream = new PrintWriter(bos, false);
-	        System.out.println("got outstream in hb client");
-	        
-	        // Send code for which server to start
-	        System.out.println("Sending connection code in hb client");
-	        outStream.println(ConnectionCodes.HEARTBEAT);
-			outStream.flush();
-
-	        // Setup the object input stream
-	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
-	        System.out.println("got ois in hb client");
-			
-	        // Receive acknowledgment and send ID
-	        System.out.println("Getting ack in hb client");
-	        inStream.readLine();
-
-	        // Setup the object writer to the server
-	        ObjectOutputStream oos = new ObjectOutputStream (bos);
-	        System.out.println("got oos in hb client");
-	        
 	        System.out.println("sending id in hb client");
 	        outStream.println(nst.get_ownID());
 	        outStream.flush();
@@ -268,12 +270,6 @@ public class ServHeartBeat implements Runnable {
 	        }
 	        
 	        System.out.println("closing in hb client");
-	        // Close all streams
-	        oos.close();
-	        outStream.close();
-	        bos.close();
-	        ois.close();
-	        inStream.close();
 		}
 		
 		catch (ClassNotFoundException ex) {

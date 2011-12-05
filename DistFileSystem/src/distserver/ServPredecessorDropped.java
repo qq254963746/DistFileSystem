@@ -64,8 +64,8 @@ public class ServPredecessorDropped implements Runnable {
 	        
 	        // Exchange Files
 	        ServHeartBeat shb = new ServHeartBeat(this.client, true);
-	        shb.runas_server(false);
 	        shb.runas_client();
+	        shb.runas_server(false);
 	        
 	        // close the connections
 	        inStream.close();
@@ -99,9 +99,9 @@ public class ServPredecessorDropped implements Runnable {
 	        outStream.flush();
 	        
 	        // Exchange Files
-	        ServHeartBeat shb = new ServHeartBeat(this.client, true);
-	        shb.runas_client();
+	        ServHeartBeat shb = new ServHeartBeat(this.client, false);
 	        shb.runas_server(true);
+	        shb.runas_client();
 	        
 	        // close the connections
 	        inStream.close();

@@ -278,11 +278,14 @@ public class Server implements Runnable {
 					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
 					sock.setSoTimeout(5000);
 					
-					// If the connection completes, run the heart beat
-					BufferedOutputStream bos = new BufferedOutputStream (sock.getOutputStream());
-					PrintWriter outStream = new PrintWriter(bos, false);
+					// Get the output stream for the server
+			        BufferedOutputStream bos = new BufferedOutputStream (
+			                sock.getOutputStream());
+			        // Setup the writer to the server
+			        PrintWriter outStream = new PrintWriter(bos, false);
 					
-					outStream.println(ConnectionCodes.HEARTBEAT);
+			        // Send code for which server to start
+			        outStream.println(ConnectionCodes.HEARTBEAT);
 					outStream.flush();
 					
 					// Setup the new thread and start
@@ -292,7 +295,6 @@ public class Server implements Runnable {
                     enterDSHB.start();
                     this.backgrounded.add(enterDSHB);
                     enterDSHB = null;
-                    
 				} 
 				// If the successor is not alive
 				catch (SocketTimeoutException e) {

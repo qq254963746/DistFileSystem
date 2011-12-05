@@ -11,7 +11,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.security.acl.LastOwnerException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -109,13 +112,106 @@ public class DistFileSystemTest {
 					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
 					sock.setSoTimeout(5000);
 					
+					// Get the output stream for the server
+			        BufferedOutputStream bos = new BufferedOutputStream (
+			                sock.getOutputStream());
+			        // Setup the writer to the server
+			        PrintWriter outStream = new PrintWriter(bos, false);
+					
+			        // Send code for which server to start
+			        outStream.println(ConnectionCodes.HEARTBEAT);
+					outStream.flush();
+					
 					// Setup the new thread and start
 					// the heartbeat thread in the background
 					ServHeartBeat dshb = new ServHeartBeat(sock, false);
 					dshb.run();
                     
 				}
+				catch (ConnectException e) {
+					Socket newpred;
+					try {
+						System.out.println("Inside initial catch");
+						// Send out message that predecessor failed
+						String failedip = nst.get_IPAt(0);
+						String nextip = nst.get_IPAt(1);
+						
+						for (int index = 0; index < nst.size(); index++) {
+							if (!failedip.equals(nst.get_IPAt(index)) &&
+									!nst.get_IPAt(index).equals(nst.get_ownIPAddress())) {
+								nextip = nst.get_IPAt(index);
+								break;
+							}
+						}
+						
+						if (nextip.equals(failedip)) {
+							nextip = nst.get_predecessorIPAddress();
+						}
+						
+						if (nextip.equals(failedip)) {
+							LastOwnerException loe = new LastOwnerException();
+							throw loe;
+						}
+						
+						newpred = new Socket(nextip, distConfig.get_servPortNumber());
+						newpred.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						BufferedOutputStream bos = new BufferedOutputStream (newpred.getOutputStream());
+						PrintWriter outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.PREDDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring in the background
+						ServPredecessorDropped dspd =
+								new ServPredecessorDropped(newpred, true);
+						dspd.run();
+						//Thread enterDSPD = new Thread(dspd);
+						//enterDSPD.start();
+						//this.backgrounded.add(enterDSPD);
+						//enterDSPD = null;
+						
+						outStream.close();
+						bos.close();
+						
+						//
+						// Send out signal that the node has failed
+						//
+						/*
+						Socket nodefail = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						nodefail.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						bos = new BufferedOutputStream (nodefail.getOutputStream());
+						outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.NODEDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring the information for the node that dropped
+						ServNodeDropped dsnd =
+								new ServNodeDropped(nodefail, false);
+						Thread enterDSND = new Thread(dsnd);
+						enterDSND.start();
+						this.backgrounded.add(enterDSND);
+						enterDSND = null;
+						
+						outStream.close();
+						bos.close();*/
+					}
+					catch (LastOwnerException loe) {
+						System.out.println("Last node in network");
+					}
+					catch (Exception we) {
+						System.out.println("two catches deep");
+						we.printStackTrace();
+					}
+				}
 				catch (Exception e) {
+					System.out.println("one catch deep");
 					e.printStackTrace();
 				}
 			}
