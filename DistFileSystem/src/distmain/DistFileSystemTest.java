@@ -4,11 +4,14 @@
 
 package distmain;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -16,10 +19,15 @@ import java.util.Vector;
 import distclient.Client;
 import distclient.ClntGetFile;
 import distclient.ClntUploadFile;
+import distconfig.ConnectionCodes;
+import distconfig.DistConfig;
 import distfilelisting.FileObject;
 import distfilelisting.LocalPathList;
 import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
+import distserver.ServHeartBeat;
+import distserver.ServNodeDropped;
+import distserver.ServPredecessorDropped;
 
 public class DistFileSystemTest {
 	private UserManagement userManage = null;
@@ -90,6 +98,26 @@ public class DistFileSystemTest {
 				
 				ClntGetFile cgf = new ClntGetFile (cli, fileName, pathToPlace, this.userManage.get_ownUserName());
 				cgf.run();
+			}
+			
+			else if (command.contains("heartbeat")) {
+				NodeSearchTable nst = NodeSearchTable.get_Instance();
+            	Socket sock;
+            	DistConfig distConfig = DistConfig.get_Instance();
+				try {
+					// Attempt to establish a connection
+					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
+					sock.setSoTimeout(5000);
+					
+					// Setup the new thread and start
+					// the heartbeat thread in the background
+					ServHeartBeat dshb = new ServHeartBeat(sock, false);
+					dshb.run();
+                    
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		catch (FileNotFoundException e) {

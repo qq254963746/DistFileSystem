@@ -70,6 +70,7 @@ public class ServHeartBeat implements Runnable {
 	 */
 	@SuppressWarnings("unchecked")
 	public void runas_server (boolean is_predecessor) {
+		System.out.println("Inside heartbeat server");
 		// Setup global parameters
 		this.distConfig = DistConfig.get_Instance();
 		this.nst = NodeSearchTable.get_Instance();
@@ -79,21 +80,29 @@ public class ServHeartBeat implements Runnable {
 			// Get the input stream for the client
 	        BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(client.getInputStream()));
+	        System.out.println("got instream in hb serv");
 	        // Get the output stream for the client
 	        BufferedOutputStream bos = new BufferedOutputStream (
 	                client.getOutputStream());
 	        // Setup the writer to the client
 	        PrintWriter outStream = new PrintWriter(bos, false);
+	        System.out.println("got outstream in hb serv");
+        
 	        // Setup the object writer to the client
 	        ObjectOutputStream oos = new ObjectOutputStream (bos);
-	        // Setup the object input stream
-	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
-	        
+	        System.out.println("got oos in hb serv");
+
 	        // Send acknowledgment
+	        System.out.println("Sending ack in hb serv");
 	        outStream.println(ConnectionCodes.HEARTBEAT);
 	        outStream.flush();
 	        
+	        // Setup the object input stream
+	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
+	        System.out.println("got ois in hb serv");
+	        
 	        // Get ID of the connecting server
+	        System.out.println("Receiver ID of connecting serv in hb serv");
 	        int prevID = Integer.parseInt(inStream.readLine());
 	        
 	        Vector<FileObject> filestosend = new Vector<FileObject>();
@@ -105,17 +114,21 @@ public class ServHeartBeat implements Runnable {
 	        else {
 	        	filestosend = lpl.get_filesBetween(Integer.parseInt(nst.get_ownID()), prevID);
 	        }
+	        System.out.println("Sending list of files in hb serv");
 	        oos.writeObject(filestosend);
 	        oos.flush();
 	        
 	        // Receive the updated vector of which files the client needs
+	        System.out.println("Receiving the list of needed files in hb serv");
 	        filestosend = (Vector<FileObject>)ois.readObject();
 	        
 	        String filename;
 	        // Loop through all the files to send
+	        System.out.println("looping through files in hb serv");
 	        for (int index = 0; index < filestosend.size(); index++) {
 	        	// First get and send the name of the file
 	        	filename = filestosend.get(index).getName();
+	        	System.out.printf("Sending name and file %s in hb serv\n", filename);
 	        	outStream.println(filename);
 	        	outStream.flush();
 	        	
@@ -138,6 +151,7 @@ public class ServHeartBeat implements Runnable {
             	inStream.readLine();
 	        }
 	        
+	        System.out.println("Closing in hb serv");
 	        // Close all streams
 	        oos.close();
 	        outStream.close();
@@ -162,6 +176,7 @@ public class ServHeartBeat implements Runnable {
 	@SuppressWarnings("unchecked")
 	public void runas_client () {
 		// Setup global parameters
+		System.out.println("Inside client in hb client");
 		this.distConfig = DistConfig.get_Instance();
 		this.nst = NodeSearchTable.get_Instance();
 		this.lpl = LocalPathList.get_Instance();
@@ -170,23 +185,37 @@ public class ServHeartBeat implements Runnable {
 			// Get the input stream for the server
 	        BufferedReader inStream = new BufferedReader (
 	                new InputStreamReader(client.getInputStream()));
+	        System.out.println("Got instream in hb client");
 	        // Get the output stream for the server
 	        BufferedOutputStream bos = new BufferedOutputStream (
 	                client.getOutputStream());
 	        // Setup the writer to the server
 	        PrintWriter outStream = new PrintWriter(bos, false);
+	        System.out.println("got outstream in hb client");
 	        
+	        // Send code for which server to start
+	        System.out.println("Sending connection code in hb client");
+	        outStream.println(ConnectionCodes.HEARTBEAT);
+			outStream.flush();
+
 	        // Setup the object input stream
 	        ObjectInputStream ois = new ObjectInputStream (client.getInputStream());
+	        System.out.println("got ois in hb client");
+			
+	        // Receive acknowledgment and send ID
+	        System.out.println("Getting ack in hb client");
+	        inStream.readLine();
+
 	        // Setup the object writer to the server
 	        ObjectOutputStream oos = new ObjectOutputStream (bos);
+	        System.out.println("got oos in hb client");
 	        
-	        // Receive acknowledgment and send ID
-	        inStream.readLine();
+	        System.out.println("sending id in hb client");
 	        outStream.println(nst.get_ownID());
 	        outStream.flush();
 	        
 	        // Receive the list of files on the server
+	        System.out.println("Getting files to receive in hb client");
 	        Vector<FileObject> filesToReceive = (Vector<FileObject>)ois.readObject();
 	        
 	        // Get the list of files that need updating
@@ -205,13 +234,16 @@ public class ServHeartBeat implements Runnable {
 	        }
 	        
 	        // Send the needed files
+	        System.out.println("Sending needed files in hb client");
 	        oos.writeObject(tmpFilesToReceive);
 	        oos.flush();
 	        
 	        // loop through the files to receive
+	        System.out.println("looping through files in hb client");
 	        for (int index = 0; index < tmpFilesToReceive.size(); index++) {
 	        	// Get the file name
 	        	String filename = inStream.readLine();
+	        	System.out.printf("got filename %s and receiving in hb client\n", filename);
 	        	
 	        	// Open the file to write to it
 	        	File toReceive = new File (distConfig.get_rootPath() + filename);
@@ -234,7 +266,8 @@ public class ServHeartBeat implements Runnable {
 	        	outStream.println(ConnectionCodes.RECEIVEDFILE);
 	        	outStream.flush();
 	        }
-	        			        
+	        
+	        System.out.println("closing in hb client");
 	        // Close all streams
 	        oos.close();
 	        outStream.close();

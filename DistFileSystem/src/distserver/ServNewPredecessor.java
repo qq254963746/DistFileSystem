@@ -75,8 +75,8 @@ public class ServNewPredecessor implements Runnable {
             
             // Get the list of files that will be transfered to the new node
             Vector<FileObject> filesToTransfer = LocalPathList.get_Instance().get_filesBetween(
-            		newPredID, 
-            		Integer.parseInt(NodeSearchTable.get_Instance().get_IDAt(0)));
+            		Integer.parseInt(NodeSearchTable.get_Instance().get_predecessorID()), 
+            		newPredID);
             
             // Send the list of files to be transfered
             System.out.printf(outputFormat, "Sending the list of files");

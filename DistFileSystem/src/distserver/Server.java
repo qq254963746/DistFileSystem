@@ -196,7 +196,7 @@ public class Server implements Runnable {
                     case ConnectionCodes.HEARTBEAT:
                     	// Setup the appropriate class
                         ServHeartBeat dshb = 
-                                new ServHeartBeat(client, false);
+                                new ServHeartBeat(client, true);
                         // Setup and start the thread, so it doesn't block
                         Thread enterDSHB = new Thread (dshb);
                         enterDSHB.start();

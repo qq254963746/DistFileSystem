@@ -73,8 +73,8 @@ public class ServNewSuccessor implements Runnable {
             
             // Get what files will need to be transfered to the new client
             Vector<FileObject> filesToTransfer = LocalPathList.get_Instance().get_filesBetween(
-            		Integer.parseInt(NodeSearchTable.get_Instance().get_predecessorID()),
-            		newSuccID);
+            		newSuccID,
+            		Integer.parseInt(NodeSearchTable.get_Instance().get_IDAt(0)));
             
             // Write the vector of files that will need to be transfered
             oos.writeObject(filesToTransfer);
