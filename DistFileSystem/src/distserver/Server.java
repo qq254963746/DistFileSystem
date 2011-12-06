@@ -14,10 +14,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
+import java.security.acl.LastOwnerException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,7 +84,7 @@ public class Server implements Runnable {
                 
         while (this.running) {
             try {
-                
+            	this.sock.setSoTimeout(distConfig.getServertimeout());
                 System.out.println("Waiting for connection");
                 client = sock.accept();
                 System.out.println("Connection from " + client.getInetAddress().getHostAddress());
@@ -203,6 +204,14 @@ public class Server implements Runnable {
                         this.backgrounded.add(enterDSHB);
                         enterDSHB = null;
                         break;
+                    case ConnectionCodes.REVERSEHEARTBEAT:
+                    	ServHeartBeat drhb = 
+                    		new ServHeartBeat (client, true, true);
+                    	Thread enterDRHB = new Thread (drhb);
+                    	enterDRHB.start();
+                    	this.backgrounded.add(enterDRHB);
+                    	enterDRHB = null;
+                    	break;
                     case ConnectionCodes.PREDDROPPED:
                     	// Setup the appropriate class
                         ServPredecessorDropped dspd = 
@@ -273,6 +282,7 @@ public class Server implements Runnable {
             	// if it is than ask for any new files
             	NodeSearchTable nst = NodeSearchTable.get_Instance();
             	Socket sock;
+            	DistConfig distConfig = DistConfig.get_Instance();
 				try {
 					// Attempt to establish a connection
 					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
@@ -291,17 +301,38 @@ public class Server implements Runnable {
 					// Setup the new thread and start
 					// the heartbeat thread in the background
 					ServHeartBeat dshb = new ServHeartBeat(sock, false);
-					Thread enterDSHB = new Thread (dshb);
-                    enterDSHB.start();
-                    this.backgrounded.add(enterDSHB);
-                    enterDSHB = null;
-				} 
-				// If the successor is not alive
-				catch (SocketTimeoutException e) {
+					dshb.run();
+                    
+				}
+				catch (ConnectException e) {
 					Socket newpred;
-					try {	
+					try {
+						System.out.println("Inside initial catch");
 						// Send out message that predecessor failed
-						newpred = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						String failedip = nst.get_IPAt(0);
+						String nextip = nst.get_IPAt(1);
+						String nextid = nst.get_IDAt(1);
+						
+						for (int index = 0; index < nst.size(); index++) {
+							if (!failedip.equals(nst.get_IPAt(index)) &&
+									!nst.get_IPAt(index).equals(nst.get_ownIPAddress())) {
+								nextip = nst.get_IPAt(index);
+								nextid = nst.get_IDAt(index);
+								break;
+							}
+						}
+						
+						if (nextip.equals(failedip)) {
+							nextip = nst.get_predecessorIPAddress();
+							nextid = nst.get_predecessorID();
+						}
+						
+						if (nextip.equals(failedip)) {
+							LastOwnerException loe = new LastOwnerException();
+							throw loe;
+						}
+						
+						newpred = new Socket(nextip, distConfig.get_servPortNumber());
 						newpred.setSoTimeout(5000);
 						
 						// If the connection completes, run the heart beat
@@ -315,18 +346,21 @@ public class Server implements Runnable {
 						// transferring in the background
 						ServPredecessorDropped dspd =
 								new ServPredecessorDropped(newpred, true);
-						Thread enterDSPD = new Thread(dspd);
-						enterDSPD.start();
-						this.backgrounded.add(enterDSPD);
-						enterDSPD = null;
+						dspd.run();
+						//Thread enterDSPD = new Thread(dspd);
+						//enterDSPD.start();
+						//this.backgrounded.add(enterDSPD);
+						//enterDSPD = null;
 						
 						outStream.close();
 						bos.close();
 						
+						nst.set(0, nextid, nextip);
+						
 						//
 						// Send out signal that the node has failed
 						//
-						Socket nodefail = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						Socket nodefail = new Socket(nextip, distConfig.get_servPortNumber());
 						nodefail.setSoTimeout(5000);
 						
 						// If the connection completes, run the heart beat
@@ -339,27 +373,23 @@ public class Server implements Runnable {
 						// Setup the new thread and start
 						// transferring the information for the node that dropped
 						ServNodeDropped dsnd =
-								new ServNodeDropped(nodefail, false);
-						Thread enterDSND = new Thread(dsnd);
-						enterDSND.start();
-						this.backgrounded.add(enterDSND);
-						enterDSND = null;
-						
-						outStream.close();
-						bos.close();
+								new ServNodeDropped(nodefail);
+						dsnd.runas_client(nst.get_ownID());
+					}
+					catch (LastOwnerException loe) {
+						System.out.println("Last node in network");
+						for (int index = 0; index < nst.size(); index++) {
+							nst.set(index, nst.get_ownID(), nst.get_ownIPAddress());
+						}
+						nst.set_predicessor(nst.get_ownID(), nst.get_ownIPAddress());
 					}
 					catch (Exception we) {
 						we.printStackTrace();
 					}
 				}
-				catch (UnknownHostException e) {
-					e.printStackTrace();
-				} 
-				catch (IOException e) {
+				catch (Exception e) {
 					e.printStackTrace();
 				}
-    	        
-            	System.out.println("Client is null");
             } 
             catch (Exception e) {
 				e.printStackTrace();

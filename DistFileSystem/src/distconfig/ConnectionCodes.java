@@ -36,6 +36,7 @@ public class ConnectionCodes {
 	public static final int NEWGROUP = 23;
 	public static final int ADDUSERTOGROUP = 24;
 	public static final int REMOVEUSERFROMGROUP = 25;
+	public static final int REVERSEHEARTBEAT = 26;
 
 	// Error Codes
 	public static final int UNRECOGNIZEDCODE = 900;

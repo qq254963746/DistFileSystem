@@ -135,17 +135,20 @@ public class DistFileSystemTest {
 						// Send out message that predecessor failed
 						String failedip = nst.get_IPAt(0);
 						String nextip = nst.get_IPAt(1);
+						String nextid = nst.get_IDAt(1);
 						
 						for (int index = 0; index < nst.size(); index++) {
 							if (!failedip.equals(nst.get_IPAt(index)) &&
 									!nst.get_IPAt(index).equals(nst.get_ownIPAddress())) {
 								nextip = nst.get_IPAt(index);
+								nextid = nst.get_IDAt(index);
 								break;
 							}
 						}
 						
 						if (nextip.equals(failedip)) {
 							nextip = nst.get_predecessorIPAddress();
+							nextid = nst.get_predecessorID();
 						}
 						
 						if (nextip.equals(failedip)) {
@@ -176,11 +179,12 @@ public class DistFileSystemTest {
 						outStream.close();
 						bos.close();
 						
+						nst.set(0, nextid, nextip);
+						
 						//
 						// Send out signal that the node has failed
 						//
-						/*
-						Socket nodefail = new Socket(nst.get_IPAt(1), distConfig.get_servPortNumber());
+						Socket nodefail = new Socket(nextip, distConfig.get_servPortNumber());
 						nodefail.setSoTimeout(5000);
 						
 						// If the connection completes, run the heart beat
@@ -193,25 +197,21 @@ public class DistFileSystemTest {
 						// Setup the new thread and start
 						// transferring the information for the node that dropped
 						ServNodeDropped dsnd =
-								new ServNodeDropped(nodefail, false);
-						Thread enterDSND = new Thread(dsnd);
-						enterDSND.start();
-						this.backgrounded.add(enterDSND);
-						enterDSND = null;
-						
-						outStream.close();
-						bos.close();*/
+								new ServNodeDropped(nodefail);
+						dsnd.runas_client(nst.get_ownID());
 					}
 					catch (LastOwnerException loe) {
 						System.out.println("Last node in network");
+						for (int index = 0; index < nst.size(); index++) {
+							nst.set(index, nst.get_ownID(), nst.get_ownIPAddress());
+						}
+						nst.set_predicessor(nst.get_ownID(), nst.get_ownIPAddress());
 					}
 					catch (Exception we) {
-						System.out.println("two catches deep");
 						we.printStackTrace();
 					}
 				}
 				catch (Exception e) {
-					System.out.println("one catch deep");
 					e.printStackTrace();
 				}
 			}
