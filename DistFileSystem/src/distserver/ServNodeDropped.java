@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import distconfig.ConnectionCodes;
 import distconfig.DistConfig;
+import distfilelisting.UserManagement;
 import distnodelisting.NodeSearchTable;
 
 /**
@@ -28,25 +29,13 @@ public class ServNodeDropped implements Runnable {
 	private Socket client = null;
 	private DistConfig distConfig = null;
 	private NodeSearchTable nst = null;
-	private boolean is_server = true;
-	
 	
 	/**
 	 * Default to run as server
 	 * @param cli : the socket to which the client is connected
 	 */
 	public ServNodeDropped (Socket cli) {
-		this(cli, true);
-	}
-	
-	/**
-	 * 
-	 * @param cli : The socket to which the client is connected
-	 * @param is_serv : True if this is being run as the server
-	 */
-	public ServNodeDropped (Socket cli, boolean is_serv) {
 		this.client = cli;
-		this.is_server = is_serv;
 	}
 	
 	/**
@@ -54,12 +43,7 @@ public class ServNodeDropped implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (this.is_server) {
-			this.runas_server();
-		}
-		else {
-			this.runas_client();
-		}
+		this.runas_server();
 	}
 		
 	private void runas_server() {
@@ -83,7 +67,7 @@ public class ServNodeDropped implements Runnable {
 	        outStream.flush();
 	        
 	        // Read in the ID and IP of the server that dropped
-	        String dropID = inStream.readLine();
+	        String startingID = inStream.readLine();
 	        
 	        // Send confirmation and close the connection
 	        outStream.println(ConnectionCodes.NODEDROPPED);
@@ -94,29 +78,34 @@ public class ServNodeDropped implements Runnable {
 	        inStream.close();
 	        client.close();
 	        
-	        // Loop through the node search table and see if anything needs to be changed
-	        boolean is_changed = false;
 	        boolean was_successor = false;
-	        for (int index = nst.size()-1; index >= 0; index--) {
-	        	if (dropID.equals(nst.get_IDAt(index))) {
-	        		is_changed = true;
-	        		if (index == nst.size()-1) {
-	        			nst.set(index, nst.get_predecessorID(), nst.get_predecessorIPAddress());
-	        		}
-	        		else {
-	        			nst.set(index, nst.get(index-1));
-	        		}
-	        		if (index == 0) {
-	        			was_successor = true;
-	        		}
-	        	}
+	        
+	        // Clear the node search table for a clean start
+	        for (int index = 1; index < nst.size(); index++) {
+	        	nst.set(index, nst.get_ownID(), nst.get_ownIPAddress());
+	        }
+	        nst.set_predicessor(nst.get_ownID(), nst.get_ownIPAddress());
+	        
+	        if (startingID.equals(nst.get_ownID())) {
+	        	was_successor = true;
 	        }
 	        
 	        // If this table was changed, send out a notification to the network,
 	        // to setup the table again.
-	        if (is_changed && !was_successor) {
-	        	pushIDAndIP (nst.get_ownID(), nst.get_ownIPAddress(), nst.get_ownID());
+	        if (!was_successor) {
+	        	client = new Socket (nst.get_IPAt(0), distConfig.get_servPortNumber());
+	        	client.setSoTimeout(5000);
+	        	
+	        	// If the connection completes, run the heart beat
+				bos = new BufferedOutputStream (client.getOutputStream());
+				outStream = new PrintWriter(bos, false);
+				
+				outStream.println(ConnectionCodes.NODEDROPPED);
+				outStream.flush();
+	        	
+	        	this.runas_client(startingID);
 	        }
+        	send_newNodeNotification(nst.get_ownID(), nst.get_ownIPAddress());
 		}
 		catch (IOException ex) {
             Logger.getLogger(ServCheckPosition.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,7 +119,7 @@ public class ServNodeDropped implements Runnable {
 	 * @param newIP : The IP of this node
 	 * @param myID : The ID of this node
 	 */
-	private void pushIDAndIP (String newID, String newIP, String myID) {
+	private void send_newNodeNotification (String newID, String newIP) {
 		try {
 	    	// Setup the socket to the next node, and the write and read buffers
 	    	Socket sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
@@ -152,6 +141,7 @@ public class ServNodeDropped implements Runnable {
 			// Send newID and newIP
 			outStream.println(newID);
 			outStream.println(newIP);
+			outStream.println(UserManagement.get_Instance().get_ownUserName());
 			outStream.flush();
 			
 			// receive confirmation
@@ -169,7 +159,7 @@ public class ServNodeDropped implements Runnable {
         }
 	}
 	
-	private void runas_client() {
+	public void runas_client(String startingID) {
 		distConfig = DistConfig.get_Instance();
 		nst = NodeSearchTable.get_Instance();
 		
@@ -187,7 +177,7 @@ public class ServNodeDropped implements Runnable {
 	        inStream.readLine();
 	        
 	        // Send the ID of the server that dropped
-	        outStream.println(nst.get_IDAt(0));
+	        outStream.println(startingID);
 	        outStream.flush();
 	        
 	        // Read confirmation

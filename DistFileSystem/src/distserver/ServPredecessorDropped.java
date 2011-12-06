@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import distconfig.ConnectionCodes;
+import distconfig.DistConfig;
 import distnodelisting.NodeSearchTable;
 
 
@@ -63,15 +64,39 @@ public class ServPredecessorDropped implements Runnable {
 	        nst.set_predicessor(newPredID, client.getInetAddress().getHostAddress());
 	        
 	        // Exchange Files
-	        ServHeartBeat shb = new ServHeartBeat(this.client, true);
-	        shb.runas_client();
-	        shb.runas_server(false);
+	        ServHeartBeat shb = new ServHeartBeat(this.client, true, false);
+	        shb.runas_server();
+	        //shb.runas_client();
 	        
-	        // close the connections
+	        String newpred = this.client.getInetAddress().getHostAddress();
+	        // close socket
 	        inStream.close();
 	        outStream.close();
 	        bos.close();
 	        this.client.close();
+			shb = null;
+	        
+	        // open new socket connection
+	        Socket sock = new Socket(newpred, DistConfig.get_Instance().get_servPortNumber());
+	        sock.setSoTimeout(5000);
+	        
+	        // Get the output stream for the server
+	        bos = new BufferedOutputStream (
+	                sock.getOutputStream());
+	        // Setup the writer to the server
+	        outStream = new PrintWriter(bos, false);
+			
+	        // Send code for which server to start
+	        outStream.println(ConnectionCodes.REVERSEHEARTBEAT);
+			outStream.flush();
+	        
+	        // setup servheartbeat
+			shb = new ServHeartBeat (sock, false, false);
+	        // runas client
+			shb.runas_client();
+	        
+	        // close the connections
+	        sock.close();
 	        
 		}
 		catch (IOException ex) {
@@ -99,9 +124,9 @@ public class ServPredecessorDropped implements Runnable {
 	        outStream.flush();
 	        
 	        // Exchange Files
-	        ServHeartBeat shb = new ServHeartBeat(this.client, false);
-	        shb.runas_server(true);
+	        ServHeartBeat shb = new ServHeartBeat(this.client, false, true);
 	        shb.runas_client();
+	        //shb.runas_server();
 	        
 	        // close the connections
 	        inStream.close();

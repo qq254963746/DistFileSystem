@@ -21,7 +21,6 @@ public class ClntGetFile implements Runnable {
 	private String fileName;
 	private boolean backup;
 	private String username;
-	private String wheretoput;
 	private boolean success = false;
 
 	public ClntGetFile(String host, Client client, String fileName, String username){
@@ -40,21 +39,11 @@ public class ClntGetFile implements Runnable {
 		this.username = username;
 	}
 	
-	private ClntGetFile (String host, Client client, String filename, String wheretoput, String username, boolean backup) {
-		this.host = host;
-		this.client = client;
-		this.fileName = filename;
-		this.backup = backup;
-		this.username = username;
-		this.wheretoput = wheretoput;
-	}
-	
 	public ClntGetFile (Client client, String filename, String wheretoput, String username) {
 		this.client = client;
 		this.backup = false;
 		this.username = username;
 		this.fileName = filename;
-		this.wheretoput = wheretoput;
 		
 		int hash = Sha1Generator.generate_Sha1(this.fileName);
 		
