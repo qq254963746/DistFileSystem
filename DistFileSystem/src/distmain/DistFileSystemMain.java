@@ -56,7 +56,6 @@ public class DistFileSystemMain {
 			
 			userManage.set_ownUserName(userName);
 			
-			/*
 			System.out.print("Would you like to [s]tart a network or [j]oin one that already exists?\n(s/j): ");
 			String response = "";
 			do {
@@ -69,33 +68,19 @@ public class DistFileSystemMain {
 			ipAddress = "";
 			InetAddressValidator validator = InetAddressValidator.getInstance();
 
+			System.out.print("Please input the IP address of the network you would like to join: ");
+			do {
+				ipAddress = inStream.readLine().trim();
+				if (!validator.isValidInet4Address(ipAddress)){
+					System.out.print("Invalid IPv4 address received. Try again: ");
+				}
+			} while (!validator.isValidInet4Address(ipAddress));
 
 			this.start_server();
-			switch (response) {
-				case "J":
-					System.out.print("Please input the IP address of the network you would like to join: ");
-					do {
-						ipAddress = inStream.readLine().trim();
-						if (!validator.isValidInet4Address(ipAddress)){
-							System.out.print("Invalid IPv4 address received. Try again: ");
-						}
-					} while (!validator.isValidInet4Address(ipAddress));
 
-					break;
-					
-				case "S":
-				default:
-					this.connect_to_network();
-				
-			}*/
-
-			System.out.print("Enter IP: ");
-			ipAddress = inStream.readLine().trim();
-			this.start_server();
-
-			if (!ipAddress.equals("")) 
+			if (response.equals("S")) {
 				this.connect_to_network();
-			
+			}
 			this.run_interface();
 			
 		} 
@@ -136,32 +121,21 @@ public class DistFileSystemMain {
 			ipAddress = "";
 			InetAddressValidator validator = InetAddressValidator.getInstance();
 
-			System.out.print("Enter IP: ");
-			ipAddress = inStream.readLine();
-			
-			if (!ipAddress.trim().equals("")) {
-				this.connect_to_network();
-			}
+			System.out.print("Please input the IP address of the network you would like to join: ");
+			do {
+				ipAddress = inStream.readLine().trim();
+				if (!validator.isValidInet4Address(ipAddress)){
+					System.out.print("Invalid IPv4 address received. Try again: ");
+				}
+			} while (!validator.isValidInet4Address(ipAddress));
+
 
 			this.start_server();
-			/*switch (response) {
-				case "J":
-					System.out.print("Please input the IP address of the network you would like to join: ");
-					do {
-						ipAddress = inStream.readLine().trim();
-						if (!validator.isValidInet4Address(ipAddress)){
-							System.out.print("Invalid IPv4 address received. Try again: ");
-						}
-					} while (!validator.isValidInet4Address(ipAddress));
-
-					break;
-					
-				case "S":
-				default:
-					this.connect_to_network();
-				
-			}*/
-
+			
+			if (response.equals("S")) {
+				this.connect_to_network();
+			}
+			
 			this.run_interface();
 			
 		} 
@@ -246,19 +220,18 @@ public class DistFileSystemMain {
 				System.out.printf(this.prompt, userName);
 				input = inStream.readLine().trim();
 		        String[] instr = p.split(input);
-				/*
-				switch (instr[0].toLowerCase()) {
-				case "quit":
+		        String action = instr[0].toLowerCase();
+								 
+				if (action.equals("quit")) {
 					return;
-				
-				case "help":
+					
+				} else if (action.equals("help")) {
 					System.out.println("Possible commands include 'quit', 'write', 'read', and 'rm'.");
 					System.out.println("write [filepermissions] [group]");
 					System.out.println("read [filename]");
 					System.out.println("rm [filename]");
-					break;
 					
-				case "write":
+				} else if (action.equals("write")) {
 					
 					if (instr.length != 3 ) {throw new InvalidInputException();}
 					perms = instr[1];
@@ -285,10 +258,7 @@ public class DistFileSystemMain {
 						System.out.println("Can not write to \"" + name + "\".");
 					}
 					
-					break;
-				
-				case "read":
-					
+				} else if (action.equals("read")) {
 					if (instr.length != 2 ) {throw new InvalidInputException();}
 					
 					name = instr[1];
@@ -304,7 +274,7 @@ public class DistFileSystemMain {
 					
 					break;
 
-				case "rm":
+				} else if (action.equals("rm")) {
 					
 					if (instr.length != 2 ) {throw new InvalidInputException();}
 					
@@ -319,13 +289,10 @@ public class DistFileSystemMain {
 						System.out.println("Can not remove \"" + name + "\".");
 					}
 					
-					break;
-					
-				default:
+				} else {
 					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
-					break;
 				}
-				*/
+				
 				if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
 					System.out.printf("Predecessor IP = %s\n", this.nst.get_predecessorIPAddress());
@@ -354,9 +321,9 @@ public class DistFileSystemMain {
 			
 			catch (IOException e) {
 				e.printStackTrace();
-			}// catch (InvalidInputException e) {
-				//System.out.println("Invalid parameters specified. Please type 'help' for command instructions. ");
-			//} catch (UserCancelException e) {System.out.println("User canceled");}
+			} catch (InvalidInputException e) {
+				System.out.println("Invalid parameters specified. Please type 'help' for command instructions. ");
+			} catch (UserCancelException e) {System.out.println("User canceled");}
 			
 		}
 	}
