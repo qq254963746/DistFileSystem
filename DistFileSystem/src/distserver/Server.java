@@ -346,11 +346,10 @@ public class Server implements Runnable {
 						// transferring in the background
 						ServPredecessorDropped dspd =
 								new ServPredecessorDropped(newpred, true);
-						dspd.run();
-						//Thread enterDSPD = new Thread(dspd);
-						//enterDSPD.start();
-						//this.backgrounded.add(enterDSPD);
-						//enterDSPD = null;
+						Thread enterDSPD = new Thread(dspd);
+						enterDSPD.start();
+						this.backgrounded.add(enterDSPD);
+						enterDSPD = null;
 						
 						outStream.close();
 						bos.close();
@@ -374,7 +373,11 @@ public class Server implements Runnable {
 						// transferring the information for the node that dropped
 						ServNodeDropped dsnd =
 								new ServNodeDropped(nodefail);
-						dsnd.runas_client(nst.get_ownID());
+						Thread enterDSND = new Thread(dsnd);
+						enterDSND.start();
+						this.backgrounded.add(enterDSND);
+						enterDSND = null;
+						
 					}
 					catch (LastOwnerException loe) {
 						System.out.println("Last node in network");

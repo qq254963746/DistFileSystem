@@ -271,12 +271,10 @@ public class DistFileSystemMain {
 					
 					cgf.run();
 					if (cgf.isSuccess()){
-						System.out.println("Write success.");
+						System.out.println("Read success.");
 					} else {
 						System.out.println("Can not read from \"" + name + "\".");
 					}
-					
-					break;
 
 				} else if (action.equals("rm")) {
 					
@@ -293,11 +291,9 @@ public class DistFileSystemMain {
 						System.out.println("Can not remove \"" + name + "\".");
 					}
 					
-				} else {
-					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
 				}
 				
-				if (input.equals("view predecessor")) {
+				else if (input.equals("view predecessor")) {
 					System.out.printf("Predecessor ID = %s\n", this.nst.get_predecessorID());
 					System.out.printf("Predecessor IP = %s\n", this.nst.get_predecessorIPAddress());
 				}
@@ -321,6 +317,10 @@ public class DistFileSystemMain {
 					dfst.runTestCommand(input);
 				}
 				
+				else if (action.equals("")) {}
+				else {
+					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
+				}
 			}
 			
 			catch (IOException e) {
