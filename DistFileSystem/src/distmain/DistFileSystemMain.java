@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
@@ -68,17 +69,19 @@ public class DistFileSystemMain {
 			ipAddress = "";
 			InetAddressValidator validator = InetAddressValidator.getInstance();
 
-			System.out.print("Please input the IP address of the network you would like to join: ");
-			do {
-				ipAddress = inStream.readLine().trim();
-				if (!validator.isValidInet4Address(ipAddress)){
-					System.out.print("Invalid IPv4 address received. Try again: ");
-				}
-			} while (!validator.isValidInet4Address(ipAddress));
+			if (response.equals("J")) {
+				System.out.print("Please input the IP address of the network you would like to join: ");
+				do {
+					ipAddress = inStream.readLine().trim();
+					if (!validator.isValidInet4Address(ipAddress)){
+						System.out.print("Invalid IPv4 address received. Try again: ");
+					}
+				} while (!validator.isValidInet4Address(ipAddress));
+			}
 
 			this.start_server();
 
-			if (response.equals("S")) {
+			if (response.equals("J")) {
 				this.connect_to_network();
 			}
 			this.run_interface();
@@ -121,18 +124,19 @@ public class DistFileSystemMain {
 			ipAddress = "";
 			InetAddressValidator validator = InetAddressValidator.getInstance();
 
-			System.out.print("Please input the IP address of the network you would like to join: ");
-			do {
-				ipAddress = inStream.readLine().trim();
-				if (!validator.isValidInet4Address(ipAddress)){
-					System.out.print("Invalid IPv4 address received. Try again: ");
-				}
-			} while (!validator.isValidInet4Address(ipAddress));
-
+			if (response.equals("J")) {
+				System.out.print("Please input the IP address of the network you would like to join: ");
+				do {
+					ipAddress = inStream.readLine().trim();
+					if (!validator.isValidInet4Address(ipAddress)){
+						System.out.print("Invalid IPv4 address received. Try again: ");
+					}
+				} while (!validator.isValidInet4Address(ipAddress));
+			}
 
 			this.start_server();
 			
-			if (response.equals("S")) {
+			if (response.equals("J")) {
 				this.connect_to_network();
 			}
 			
@@ -237,15 +241,15 @@ public class DistFileSystemMain {
 					perms = instr[1];
 					group = instr[2];
 						
-					FileDialog fd = new FileDialog(frame, "Select a file to write", FileDialog.LOAD);
+					JFileChooser fd = new JFileChooser(dcf.get_rootPath());
 					System.out.println(dcf.get_rootPath());
-					fd.setDirectory(dcf.get_rootPath());
-					fd.setVisible(true);
+					fd.setMultiSelectionEnabled(false);
+					fd.showOpenDialog(frame);
 					
-					fileName = fd.getFile();
+					fileName = fd.getSelectedFile().getPath();
 					if (fileName == null) { throw new UserCancelException();}
 					
-					File f = new File(fd.getFile());
+					File f = fd.getSelectedFile();
 					name = f.getName();
 					FileObject fo = new FileObject(name, perms, userName, group);
 					
