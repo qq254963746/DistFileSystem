@@ -54,13 +54,15 @@ public class ServUserManagement implements Runnable {
             String origID = inStream.readLine();
             // Get the user name of the requester
             String origUserName = inStream.readLine();
-            // Get what they want to be done
-            Integer manageCode = Integer.parseInt(inStream.readLine());
             // Get the group to modify
             String groupName = inStream.readLine();
+            // Get what they want to be done
+            Integer manageCode = Integer.parseInt(inStream.readLine());
+            
             // The results of the usermanagement
             String[] results = new String[2];
-            String userToChange = null;
+            int num;
+            String[] userToChange = null;
             
             switch (manageCode) {
             case ConnectionCodes.NEWGROUP:
@@ -76,10 +78,16 @@ public class ServUserManagement implements Runnable {
             case ConnectionCodes.ADDUSERTOGROUP:
             	// Send confirm signal
             	outStream.println(ConnectionCodes.ADDUSERTOGROUP);
-            	// Get the user to be added
-            	userToChange = inStream.readLine();
-            	// Create the group
-            	results = userManage.add_UserToGroup(userToChange, groupName, origUserName, "1");
+            	// Get the number of users to add
+            	num = Integer.parseInt(inStream.readLine());
+            	userToChange = new String[num];
+            	
+            	for(int index = 0; index < num; index++) {
+            		userToChange[index] = inStream.readLine();
+            		results = userManage.add_UserToGroup(userToChange[index], groupName, origUserName, "1");
+            	}
+            	
+            	
             	// Send the results back
             	outStream.println(results[0]);
             	outStream.println(results[1]);
@@ -88,10 +96,13 @@ public class ServUserManagement implements Runnable {
             case ConnectionCodes.REMOVEUSERFROMGROUP:
             	// Send confirm signal
             	outStream.println(ConnectionCodes.REMOVEUSERFROMGROUP);
-            	// Get the user to be removed
-            	userToChange = inStream.readLine();
-            	// Remove the user from the group
-            	results = userManage.remove_UserFromGroup(userToChange, groupName, origUserName, "1");
+            	num = Integer.parseInt(inStream.readLine());
+            	userToChange = new String[num];
+            	
+            	for(int index = 0; index < num; index++) {
+            		userToChange[index] = inStream.readLine();
+            		results = userManage.add_UserToGroup(userToChange[index], groupName, origUserName, "1");
+            	}
             	// Send back the results
             	outStream.println(results[0]);
             	outStream.println(results[1]);
@@ -146,28 +157,48 @@ public class ServUserManagement implements Runnable {
 					// Send the originating ID, username
 					outStream.println(origID);
 					outStream.println(origUserName);
+					outStream.flush();
 					
 					// Send the next code and group name
-					outStream.println(manageCode);
 					outStream.println(groupName);
+					outStream.println(manageCode);
+					outStream.flush();
 					
 					// Receive ack
 					Integer ack = Integer.parseInt(inStream.readLine());
 					
 					switch (ack) {
 					case ConnectionCodes.NEWGROUP:
-						break;
-					case ConnectionCodes.ADDUSERTOGROUP:
-					case ConnectionCodes.REMOVEUSERFROMGROUP:
-						// Send the user to be added or removed
-						outStream.println(userToChange);
+						outStream.println(ConnectionCodes.NEWGROUP);
 						outStream.flush();
+						inStream.readLine();
+						break;
+						
+					case ConnectionCodes.ADDUSERTOGROUP:
+						outStream.println(ConnectionCodes.ADDUSERTOGROUP);
+						outStream.flush();
+						inStream.readLine();
+						outStream.println(userToChange.length);
+						outStream.flush();
+						for (int index = 0; index < userToChange.length; index++) {
+							outStream.println(userToChange[index]);
+						}
+						break;
+						
+					case ConnectionCodes.REMOVEUSERFROMGROUP:
+						outStream.println(ConnectionCodes.REMOVEUSERFROMGROUP);
+						outStream.flush();
+						inStream.readLine();
+						outStream.println(userToChange.length);
+						outStream.flush();
+						for (int index = 0; index < userToChange.length; index++) {
+							outStream.println(userToChange[index]);
+						}
 						break;
 					}
 					
-					// Get the result
-					inStream.readLine();
-					inStream.readLine();
+					System.out.println(inStream.readLine());
+					System.out.println(inStream.readLine());
 					
 		            // Close connection
 					outStream.close();

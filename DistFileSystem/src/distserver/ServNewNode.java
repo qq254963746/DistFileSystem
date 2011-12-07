@@ -66,6 +66,8 @@ public class ServNewNode implements Runnable {
 	        // Receive new user name
 	        String username = inStream.readLine();
 	        
+	        System.out.printf("name: %s\tID: %d\tIP: %s\n", username, newID, newIP);
+	        
 	        // Send received confirmation
 	        System.out.println("Sending ack, in run in ServNewNode");
 	        outStream.println(ConnectionCodes.NEWNODE);
@@ -85,9 +87,10 @@ public class ServNewNode implements Runnable {
 	        useManage.add_User(username, "1");
 	        
 	        int myID = Integer.parseInt(nst.get_ownID());
+	        System.out.printf("MyID: %d\tNewID: %d\n", myID, newID);
 	        // If the newID is not the same as this servers ID
 	        //		aka, it hasn't made it all the way around the network yet
-	        if (!(newID == myID)) {
+	        if (newID != myID) {
 	        	// If the new ID is between my ID and the predecessor's ID,
 				// Set the new ID to be the predecessor
 	        	System.out.println("Checking predecessor");
@@ -112,7 +115,7 @@ public class ServNewNode implements Runnable {
 		    	}
 		    	
 	        	// Alter the search table and send the newIP and newID along to the next server
-	        	this.pushNewIDAndIP(newID, newIP, username, myID);
+	        	this.pushNewIDAndIP(newID, newIP, username);
 	        	// Send this node's information to the new node
 	        	this.sendOwnInfo(newIP);
 	        }
@@ -130,7 +133,7 @@ public class ServNewNode implements Runnable {
 	 * @param newIP : The string representation of the new node's IP
 	 * @param myID : The integer representation of this node's ID
 	 */
-	private void pushNewIDAndIP (int newID, String newIP, String newUser, int myID) {
+	private void pushNewIDAndIP (int newID, String newIP, String newUser) {
 		try {
 	    	System.out.printf("Connecting to %s, in push in ServNewNode\n", nst.get_IPAt(0));
 	    	// Setup the socket to the next node, and the write and read buffers

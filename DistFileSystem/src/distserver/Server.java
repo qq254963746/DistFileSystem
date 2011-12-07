@@ -19,6 +19,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.acl.LastOwnerException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,12 +36,15 @@ public class Server implements Runnable {
     private boolean running = true;
     private Vector<Thread> backgrounded = new Vector<Thread>();
     private DistConfig distConfig;
+    private Timer timer = null;
     
     public Server () {
         this.distConfig = DistConfig.get_Instance();
         
         try {
             this.sock = new ServerSocket(this.distConfig.get_servPortNumber());
+            this.timer = new Timer();
+            this.setTimerTask();
             //this.sock.setSoTimeout(distConfig.getServertimeout());
         }
         catch (IOException e) {
@@ -84,7 +89,7 @@ public class Server implements Runnable {
                 
         while (this.running) {
             try {
-            	this.sock.setSoTimeout(distConfig.getServertimeout());
+            	//this.sock.setSoTimeout(distConfig.getServertimeout());
                 System.out.println("Waiting for connection");
                 client = sock.accept();
                 System.out.println("Connection from " + client.getInetAddress().getHostAddress());
@@ -398,6 +403,137 @@ public class Server implements Runnable {
 				e.printStackTrace();
 			}
         }
+    }
+    
+    private void setTimerTask () {
+    	timer.scheduleAtFixedRate(new TimerTask() {
+    		public void run() {
+    			// The server socket connection timed out
+            	// check to see if the successor is still there
+            	// if it is than ask for any new files
+            	NodeSearchTable nst = NodeSearchTable.get_Instance();
+            	Socket sock;
+            	DistConfig distConfig = DistConfig.get_Instance();
+				try {
+					// Attempt to establish a connection
+					sock = new Socket(nst.get_IPAt(0), distConfig.get_servPortNumber());
+					sock.setSoTimeout(5000);
+					
+					// Get the output stream for the server
+			        BufferedOutputStream bos = new BufferedOutputStream (
+			                sock.getOutputStream());
+			        // Setup the writer to the server
+			        PrintWriter outStream = new PrintWriter(bos, false);
+					
+			        // Send code for which server to start
+			        outStream.println(ConnectionCodes.HEARTBEAT);
+					outStream.flush();
+					
+					// Setup the new thread and start
+					// the heartbeat thread in the background
+					ServHeartBeat dshb = new ServHeartBeat(sock, false);
+					dshb.run();
+                    
+				}
+				catch (ConnectException e) {
+					Socket newpred;
+					try {
+						System.out.println("Inside initial catch");
+						// Send out message that predecessor failed
+						String failedip = nst.get_IPAt(0);
+						String nextip = nst.get_IPAt(1);
+						String nextid = nst.get_IDAt(1);
+						
+						for (int index = 0; index < nst.size(); index++) {
+							if (!failedip.equals(nst.get_IPAt(index)) &&
+									!nst.get_IPAt(index).equals(nst.get_ownIPAddress())) {
+								nextip = nst.get_IPAt(index);
+								nextid = nst.get_IDAt(index);
+								break;
+							}
+						}
+						
+						if (nextip.equals(failedip)) {
+							nextip = nst.get_predecessorIPAddress();
+							nextid = nst.get_predecessorID();
+						}
+						
+						if (nextip.equals(failedip)) {
+							LastOwnerException loe = new LastOwnerException();
+							throw loe;
+						}
+						
+						nst.set(0, nextid, nextip);
+						
+						newpred = new Socket(nextip, distConfig.get_servPortNumber());
+						newpred.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						BufferedOutputStream bos = new BufferedOutputStream (newpred.getOutputStream());
+						PrintWriter outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.PREDDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring in the background
+						ServPredecessorDropped dspd =
+								new ServPredecessorDropped(newpred, true);
+						dspd.run();
+						//Thread enterDSPD = new Thread(dspd);
+						//enterDSPD.start();
+						//this.backgrounded.add(enterDSPD);
+						//enterDSPD = null;
+						
+						outStream.close();
+						bos.close();
+						
+						nst.set(0, nextid, nextip);
+						
+						//
+						// Send out signal that the node has failed
+						//
+						Socket nodefail = new Socket(nextip, distConfig.get_servPortNumber());
+						nodefail.setSoTimeout(5000);
+						
+						// If the connection completes, run the heart beat
+						bos = new BufferedOutputStream (nodefail.getOutputStream());
+						outStream = new PrintWriter(bos, false);
+						
+						outStream.println(ConnectionCodes.NODEDROPPED);
+						outStream.flush();
+						
+						// Setup the new thread and start
+						// transferring the information for the node that dropped
+						ServNodeDropped dsnd =
+								new ServNodeDropped(nodefail);
+						dsnd.runas_client(nst.get_ownID());
+						//Thread enterDSND = new Thread(dsnd);
+						//enterDSND.start();
+						//this.backgrounded.add(enterDSND);
+						//enterDSND = null;
+						
+					}
+					catch (LastOwnerException loe) {
+						System.out.println("Last node in network");
+						for (int index = 0; index < nst.size(); index++) {
+							nst.set(index, nst.get_ownID(), nst.get_ownIPAddress());
+						}
+						nst.set_predicessor(nst.get_ownID(), nst.get_ownIPAddress());
+					}
+					catch (Exception we) {
+						we.printStackTrace();
+					}
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+    		}
+    	}, distConfig.getServertimeout(), distConfig.getServertimeout());
+    }
+    
+    public void runHeartBeat() {
+    	
     }
     
     
