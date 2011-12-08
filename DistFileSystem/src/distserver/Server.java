@@ -199,7 +199,9 @@ public class Server implements Runnable {
                         this.backgrounded.add(enterDSUF);
                         enterDSUF = null;
                         break;
-                    case ConnectionCodes.HEARTBEAT:
+                    case ConnectionCodes.FORCEHEARTBEAT:
+                    	throw new SocketTimeoutException();
+				case ConnectionCodes.HEARTBEAT:
                     	// Setup the appropriate class
                         ServHeartBeat dshb = 
                                 new ServHeartBeat(client, true);
@@ -361,10 +363,11 @@ public class Server implements Runnable {
 						// transferring in the background
 						ServPredecessorDropped dspd =
 								new ServPredecessorDropped(newpred, true);
-						Thread enterDSPD = new Thread(dspd);
-						enterDSPD.start();
-						this.backgrounded.add(enterDSPD);
-						enterDSPD = null;
+						dspd.run();
+						//Thread enterDSPD = new Thread(dspd);
+						//enterDSPD.start();
+						//this.backgrounded.add(enterDSPD);
+						//enterDSPD = null;
 						
 						outStream.close();
 						bos.close();
@@ -388,10 +391,11 @@ public class Server implements Runnable {
 						// transferring the information for the node that dropped
 						ServNodeDropped dsnd =
 								new ServNodeDropped(nodefail);
-						Thread enterDSND = new Thread(dsnd);
-						enterDSND.start();
-						this.backgrounded.add(enterDSND);
-						enterDSND = null;
+						dsnd.runas_client(nst.get_ownID());
+						//Thread enterDSND = new Thread(dsnd);
+						//enterDSND.start();
+						//this.backgrounded.add(enterDSND);
+						//enterDSND = null;
 						
 					}
 					catch (LastOwnerException loe) {

@@ -5,11 +5,13 @@
 
 package distmain;
 
-import java.awt.FileDialog;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
@@ -17,6 +19,7 @@ import javax.swing.JFrame;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
 import distclient.*;
+import distconfig.ConnectionCodes;
 import distconfig.Constants;
 import distconfig.DistConfig;
 import distconfig.Sha1Generator;
@@ -36,6 +39,7 @@ public class DistFileSystemMain {
 	private Client cli = new Client();
 	
 	private String ipAddress = null;
+	private Server serv = null;
 	private Thread thServ = null;
 	private DistConfig dcf = DistConfig.get_Instance();
 	
@@ -150,7 +154,7 @@ public class DistFileSystemMain {
 	
 	public void start_server() {
 		System.out.println("Starting Server");
-		Server serv = new Server();
+		serv = new Server();
 		thServ = new Thread (serv);
 		thServ.start();
 	}
@@ -318,6 +322,44 @@ public class DistFileSystemMain {
 				}
 				
 				else if (action.equals("")) {}
+				else if (action.equals("exit")) {
+					exit = true;
+					if (DistConfig.get_Instance().get_CurrNodes() != 1) {
+						Socket sock = new Socket(NodeSearchTable.get_Instance().get_predecessorIPAddress(),
+								DistConfig.get_Instance().get_servPortNumber());
+						sock.setSoTimeout(5000);
+						BufferedOutputStream bos = new BufferedOutputStream (
+			                    sock.getOutputStream());
+						System.out.println("Got OutputStream");
+						PrintWriter outStream = new PrintWriter(bos, false);
+						System.out.println("Got PrintWriter");
+						outStream.println(ConnectionCodes.FORCEHEARTBEAT);
+						outStream.flush();
+				        sock.close();
+				        try {
+							Thread.sleep(4000);
+							serv.stop_Server();
+					        int count = 0;
+					        while (this.thServ.isAlive() && count != 20) {
+					        	Thread.sleep(4000);
+					        	count++;
+					        }
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+				        sock = new Socket(NodeSearchTable.get_Instance().get_predecessorIPAddress(),
+								DistConfig.get_Instance().get_servPortNumber());
+						sock.setSoTimeout(5000);
+						bos = new BufferedOutputStream (
+			                    sock.getOutputStream());
+						System.out.println("Got OutputStream");
+						outStream = new PrintWriter(bos, false);
+						System.out.println("Got PrintWriter");
+						outStream.println(ConnectionCodes.FORCEHEARTBEAT);
+						outStream.flush();
+						sock.close();
+					}
+				}
 				else {
 					System.out.println("Unrecognized command: \""+ instr[0] + "\". Please type 'help' for command instructions. ");
 				}
