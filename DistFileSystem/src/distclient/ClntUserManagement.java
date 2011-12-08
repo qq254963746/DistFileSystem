@@ -86,6 +86,7 @@ public class ClntUserManagement implements Runnable {
 				outStream.flush();
 				for (int index = 0; index < this.usersToModify.length; index++) {
 					outStream.println(this.usersToModify[index]);
+					outStream.flush();
 				}
 				
 				System.out.println(inStream.readLine());
@@ -100,6 +101,7 @@ public class ClntUserManagement implements Runnable {
 				outStream.flush();
 				for (int index = 0; index < this.usersToModify.length; index++) {
 					outStream.println(this.usersToModify[index]);
+					outStream.flush();
 				}
 				
 				System.out.println(inStream.readLine());

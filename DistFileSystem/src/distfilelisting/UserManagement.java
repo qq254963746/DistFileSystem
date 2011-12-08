@@ -187,11 +187,11 @@ public class UserManagement implements Serializable {
     	}
     	else {
     		Vector<String> currGroups = this.globalUserGroups.get(userToRemove);
-    		currGroups.add(groupName);
+    		currGroups.remove(groupName);
     		this.globalUserGroups.put(userToRemove, currGroups);
     		
     		retval[0] = Integer.toString(Constants.SUCCESS);
-    		retval[1] = "Successfully added " + userToRemove +
+    		retval[1] = "Successfully removed " + userToRemove +
     				", to group " + groupName + ".";
     	}
     	
@@ -245,5 +245,25 @@ public class UserManagement implements Serializable {
 			users.put(key, groups);
 		}
 		return users;
+	}
+	
+	public boolean doesGroupExist (String groupName) {
+		for (int index = 0; index < this.globalGroupList.size(); index++) {
+			if (groupName.equals(this.globalGroupList.get(index))) {
+				return true;
+			}
+		}
+			
+		return false;
+	}
+	
+	public boolean doesUserExist (String userName) {
+		try {
+			this.globalUsers.get(userName);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
 	}
 }

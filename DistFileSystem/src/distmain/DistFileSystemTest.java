@@ -22,7 +22,9 @@ import java.util.Vector;
 import distclient.Client;
 import distclient.ClntGetFile;
 import distclient.ClntUploadFile;
+import distclient.ClntUserManagement;
 import distconfig.ConnectionCodes;
+import distconfig.Constants;
 import distconfig.DistConfig;
 import distfilelisting.FileObject;
 import distfilelisting.LocalPathList;
@@ -101,6 +103,86 @@ public class DistFileSystemTest {
 				
 				ClntGetFile cgf = new ClntGetFile (cli, fileName, pathToPlace, this.userManage.get_ownUserName());
 				cgf.run();
+			}
+			
+			else if (command.contains("group management")) {
+				boolean correct = false;
+				System.out.print("[A]dd group, Add [U]ser(s) to group, or [R]emove user(s) from group: ");
+				String whatToDo = inStream.readLine().toUpperCase();
+				while (!correct) {
+					if (whatToDo.equals("A") || 
+							whatToDo.equals("U") ||
+							whatToDo.equals("R")) {
+						System.out.print("Enter Group Name: ");
+						correct = true;
+					}
+					else {
+						System.out.print("Please enter either A, U, or R: ");
+						whatToDo = inStream.readLine().toUpperCase();
+					}
+				}
+				
+				correct = false;
+				
+				System.out.print("Enter Group Name: ");
+				String groupName = inStream.readLine();
+				if (!whatToDo.equals("A") &&
+						!this.userManage.doesGroupExist(groupName)) {
+					System.out.println("Group does not exist");
+				}
+				else if (whatToDo.equals("A") &&
+						this.userManage.doesGroupExist(groupName)) {
+					System.out.println("This group already exists");
+				}
+				else if (!whatToDo.equals("A")) {
+					if (!this.userManage.is_UserInGroup(this.userManage.get_ownUserName(), groupName)) {
+						System.out.println("You do not have permission to do this");
+						correct = false;
+					}
+					else
+						correct = true;
+				}
+				else if (whatToDo.equals("A") &&
+						!this.userManage.doesGroupExist(groupName)) {
+					correct = true;
+				}
+				
+				ClntUserManagement cum = null;
+				if (correct && !whatToDo.equals("A")) {
+					System.out.print("Enter comma seperated list of users to ");
+					if (whatToDo.equals("U"))
+						System.out.print("add: ");
+					else
+						System.out.print("remove: ");
+					String users = inStream.readLine();
+					String[] userArr = users.split(",");
+					
+					correct = true;
+					
+					for (String  uName : userArr) {
+						if (!this.userManage.doesUserExist(uName)) {
+							System.out.printf("User %s, does not exist\n", uName);
+							correct = false;
+						}
+					}
+					
+					
+					if (correct && whatToDo.equals("U")) {
+						cum = new ClntUserManagement(Constants.ADDUSERTOGROUP, userArr, groupName);
+					}
+					else if (correct) {
+						cum = new ClntUserManagement(Constants.REMOVEUSERFROMGROUP, userArr, groupName);
+					}
+				}
+				
+				else if (correct && whatToDo.equals("A")) {
+					String[] myUser = {this.userManage.get_ownUserName()};
+					cum = new ClntUserManagement(Constants.CREATEGROUP, myUser, groupName);
+				}
+				
+				if (correct)
+					cum.run();
+				
 			}
 			
 			else if (command.contains("heartbeat")) {

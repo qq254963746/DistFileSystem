@@ -237,6 +237,16 @@ public class Server implements Runnable {
                         this.backgrounded.add(enterDSND);
                         enterDSND = null;
                         break;
+                    case ConnectionCodes.USERMANAGEMENT:
+                    	// Setup the appropriate class
+                        ServUserManagement dsud = 
+                                new ServUserManagement(client);
+                        // Setup and start the thread, so it doesn't block
+                        Thread enterDSUD = new Thread (dsud);
+                        enterDSUD.start();
+                        this.backgrounded.add(enterDSUD);
+                        enterDSUD = null;
+                    	break;
                     default:
                         NumberFormatException nfe =
                                 new NumberFormatException();

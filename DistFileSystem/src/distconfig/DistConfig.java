@@ -29,9 +29,9 @@ public class DistConfig implements Serializable {
     
     private String rootpath = null;
     private int bufferSize = 1024;
-    //private int servertimeout = 300000; //Default 5 min
+    private int servertimeout = 300000; //Default 5 min
     // For testing purposes
-    private int servertimeout = 10000;
+    //private int servertimeout = 10000;
     
     private DistConfig() {
     	this.rootpath = System.getProperty("user.dir");

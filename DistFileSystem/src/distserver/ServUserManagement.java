@@ -45,6 +45,7 @@ public class ServUserManagement implements Runnable {
                     client.getOutputStream());
             // Setup the writer to the client
             PrintWriter outStream = new PrintWriter(bos, false);
+            System.out.println("Got streams");
             
             // Send acknowledgment everything is set
             outStream.println(ConnectionCodes.USERMANAGEMENT);
@@ -68,6 +69,7 @@ public class ServUserManagement implements Runnable {
             case ConnectionCodes.NEWGROUP:
             	// Send confirm signal
             	outStream.println(ConnectionCodes.NEWGROUP);
+            	outStream.flush();
             	// Create the group
             	results = userManage.create_Group(groupName, origUserName, "1");
             	// Send the code and string
@@ -78,6 +80,7 @@ public class ServUserManagement implements Runnable {
             case ConnectionCodes.ADDUSERTOGROUP:
             	// Send confirm signal
             	outStream.println(ConnectionCodes.ADDUSERTOGROUP);
+            	outStream.flush();
             	// Get the number of users to add
             	num = Integer.parseInt(inStream.readLine());
             	userToChange = new String[num];
@@ -96,12 +99,13 @@ public class ServUserManagement implements Runnable {
             case ConnectionCodes.REMOVEUSERFROMGROUP:
             	// Send confirm signal
             	outStream.println(ConnectionCodes.REMOVEUSERFROMGROUP);
+            	outStream.flush();
             	num = Integer.parseInt(inStream.readLine());
             	userToChange = new String[num];
             	
             	for(int index = 0; index < num; index++) {
             		userToChange[index] = inStream.readLine();
-            		results = userManage.add_UserToGroup(userToChange[index], groupName, origUserName, "1");
+            		results = userManage.remove_UserFromGroup(userToChange[index], groupName, origUserName, "1");
             	}
             	// Send back the results
             	outStream.println(results[0]);
@@ -111,6 +115,7 @@ public class ServUserManagement implements Runnable {
             default:
             	// The code wasn't recognized, send back that signal
             	outStream.println(ConnectionCodes.UNRECOGNIZEDCODE);
+            	outStream.flush();
             	results[0] = Integer.toString(Constants.FAILURE);
             	results[1] = "The code " + manageCode + 
             			", was unrecognized as a user management code.";
@@ -169,30 +174,23 @@ public class ServUserManagement implements Runnable {
 					
 					switch (ack) {
 					case ConnectionCodes.NEWGROUP:
-						outStream.println(ConnectionCodes.NEWGROUP);
-						outStream.flush();
-						inStream.readLine();
 						break;
 						
 					case ConnectionCodes.ADDUSERTOGROUP:
-						outStream.println(ConnectionCodes.ADDUSERTOGROUP);
-						outStream.flush();
-						inStream.readLine();
 						outStream.println(userToChange.length);
 						outStream.flush();
 						for (int index = 0; index < userToChange.length; index++) {
 							outStream.println(userToChange[index]);
+							outStream.flush();
 						}
 						break;
 						
 					case ConnectionCodes.REMOVEUSERFROMGROUP:
-						outStream.println(ConnectionCodes.REMOVEUSERFROMGROUP);
-						outStream.flush();
-						inStream.readLine();
 						outStream.println(userToChange.length);
 						outStream.flush();
 						for (int index = 0; index < userToChange.length; index++) {
 							outStream.println(userToChange[index]);
+							outStream.flush();
 						}
 						break;
 					}
